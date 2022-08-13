@@ -16,6 +16,8 @@ type userRepositoryInterface interface {
 	ListName(name string, offset, limit, page int) ([]model.User, error)
 	CountListName(name string) (int, error)
 	Find(id string) (*model.User, error)
+	Update(user *model.User) error
+	Remove(id string) error
 }
 
 type userRepositoryImpl struct{}
@@ -282,6 +284,75 @@ func (r *userRepositoryImpl) Find(id string) (*model.User, error) {
 	}
 
 	return nil, errors.New("error finding")
+}
+
+func (r *userRepositoryImpl) Update(user *model.User) error {
+	db, err := utils.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	sqlText := `
+	update tb_user set
+		nick = $2,
+		email = $3,
+		kind = $4,
+		updated_at = now()
+	where deleted_at is null and id = $1
+	`
+
+	statement, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+	result, err := statement.Exec(user.UserID, user.Nick, user.Email, user.Kind)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowAffected != 1 {
+		return errors.New("error when updating")
+	}
+
+	return nil
+}
+
+func (r *userRepositoryImpl) Remove(id string) error {
+	db, err := utils.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	sqlText := `
+	update tb_user set
+		deleted_at = now()
+	where id = $1
+	`
+	statement, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+	result, err := statement.Exec(id)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rowAffected != 1 {
+		return errors.New("error when deleting")
+	}
+
+	return nil
 }
 
 func NewUserRepository() userRepositoryInterface {

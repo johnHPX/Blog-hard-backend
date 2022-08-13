@@ -313,3 +313,108 @@ func UserFindHandler() http.Handler {
 		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
 	)
 }
+
+type userUpdateRequest struct {
+	ID        string
+	Name      string `json:"name"`
+	Telephone string `json:"telephone"`
+	Nick      string `json:"nick"`
+	Email     string `json:"email"`
+	Kind      string `json:"kind"`
+	MID       string `json:"mid"`
+}
+
+type userUpdateResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodeUserUpdateRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	dto := new(userUpdateRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	dto.ID = id
+	return dto, nil
+}
+
+func makeUserUpdateendPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userUpdateRequest)
+		if !ok {
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1010, errors.New("invalid request"), "na")
+		}
+
+		service := service.NewUserService()
+		err := service.Update(req.ID, req.Name, req.Telephone, req.Nick, req.Email, req.Kind)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1011, err, req.MID)
+		}
+
+		return &userUpdateResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UserUpdateHandler() http.Handler {
+	return httptransport.NewServer(
+		makeUserUpdateendPoint(),
+		decodeUserUpdateRequest,
+		utils.EncodeResponse,
+		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+	)
+}
+
+type userRemoveRequest struct {
+	ID  string
+	MID string
+}
+
+type userRemoveResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodeUserRemoveRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	mid := r.URL.Query().Get("mid")
+	dto := &userRemoveRequest{
+		ID:  id,
+		MID: mid,
+	}
+	return dto, nil
+}
+
+func makeUserRemoveendPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userRemoveRequest)
+		if !ok {
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1012, errors.New("invalid request"), "na")
+		}
+
+		service := service.NewUserService()
+		err := service.Remove(req.ID)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1013, err, req.MID)
+		}
+
+		return &userRemoveResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UserRemoveHandler() http.Handler {
+	return httptransport.NewServer(
+		makeUserRemoveendPoint(),
+		decodeUserRemoveRequest,
+		utils.EncodeResponse,
+		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+	)
+}

@@ -31,4 +31,16 @@ var userRoutes = []Router{
 		EndPointer: resource.UserFindHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},
+	{
+		TokenIsReq: false,
+		Path:       "/user/update/id/{id}",
+		EndPointer: resource.UserUpdateHandler().ServeHTTP,
+		Method:     http.MethodPut,
+	},
+	{
+		TokenIsReq: false,
+		Path:       "/user/remove/id/{id}",
+		EndPointer: resource.UserRemoveHandler().ServeHTTP,
+		Method:     http.MethodDelete,
+	},
 }
