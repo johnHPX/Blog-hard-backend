@@ -5,5 +5,5 @@ database:
   host: "postgresql-server-hardprox.cn62zsakc6gw.sa-east-1.rds.amazonaws.com"
   user: "GoUser"
   pswd: "gouser"
-  dbnm: "db-news"
+  dbnm: "db-blogHard"
   port: "5432"

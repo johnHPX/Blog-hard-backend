@@ -13,8 +13,8 @@ RUN go mod verify
 # gerando um binario da aplicação
 RUN go build -o /server cmd/webapi/main.go
 
-# imagem distroless, para redução do dockerfile
-FROM gcr.io/distroless/base-debian10
+# imagem scratch, para redução do dockerfile
+FROM scratch
 
 # configurando o diretorio
 WORKDIR /

@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/gorilla/handlers"
-	"github.com/johnHPX/blog-hard-backend/internal/routers"
+	"github.com/johnHPX/blog-hard-backend/internal/routes"
 	"github.com/johnHPX/blog-hard-backend/internal/utils"
 )
 
@@ -29,7 +29,7 @@ func main() {
 	log.Println("Initialized Routes")
 
 	//init web service
-	wsvc := routers.NewWebService()
+	wsvc := routes.NewWebService()
 	wsvc.Init()
 	loggedRouter := handlers.LoggingHandler(os.Stdout, wsvc.GetRouters())
 	//server setup

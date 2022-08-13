@@ -1,4 +1,4 @@
-package routers
+package routes
 
 import (
 	"net/http"
@@ -25,6 +25,7 @@ type webServiceImpl struct {
 
 func (s *webServiceImpl) configuration() {
 	routers := []Router{}
+	routers = append(routers, userRoutes...)
 	for _, router := range routers {
 		if router.TokenIsReq {
 			s.Router.HandleFunc(router.Path, utils.Logger(utils.Authenticate(router.EndPointer), router.Method))
