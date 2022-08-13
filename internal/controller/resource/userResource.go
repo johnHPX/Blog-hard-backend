@@ -9,6 +9,7 @@ import (
 
 	"github.com/go-kit/kit/endpoint"
 	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/gorilla/mux"
 	"github.com/johnHPX/blog-hard-backend/internal/controller/service"
 	"github.com/johnHPX/blog-hard-backend/internal/utils"
 )
@@ -159,6 +160,155 @@ func UserListHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserListendPoint(),
 		decodeUserListRequest,
+		utils.EncodeResponse,
+		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+	)
+}
+
+type userListNameRequest struct {
+	Name   string
+	Offset int
+	Limit  int
+	Page   int
+	MID    string
+}
+
+type userListNameResponse struct {
+	Count int          `json:"count"`
+	Users []userEntity `json:"users"`
+	MID   string       `json:"mid"`
+}
+
+func decodeUserListNameRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	name := vars["name"]
+	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
+	if err != nil {
+		offset = 0
+	}
+	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
+	if err != nil {
+		limit = 10
+	}
+	page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)
+	if err != nil {
+		page = 1
+	}
+	mid := r.URL.Query().Get("mid")
+	dto := &userListNameRequest{
+		Name:   name,
+		Offset: int(offset),
+		Limit:  int(limit),
+		Page:   int(page),
+		MID:    mid,
+	}
+	return dto, nil
+}
+
+func makeUserListNameendPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userListNameRequest)
+		if !ok {
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1005, errors.New("invalid request"), "na")
+		}
+
+		service := service.NewUserService()
+		users, err := service.ListName(req.Name, req.Offset, req.Limit, req.Page)
+
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1006, err, req.MID)
+		}
+
+		count, err := service.CountName(req.Name)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1007, err, req.MID)
+		}
+
+		var entities []userEntity
+		for _, v := range users {
+			entities = append(entities, userEntity{
+				PersonID:  v.PersonID,
+				UserID:    v.UserID,
+				Name:      v.Name,
+				Telephone: v.Telephone,
+				Nick:      v.Nick,
+				Email:     v.Email,
+				Kind:      v.Kind,
+			})
+		}
+
+		return &userListResponse{
+			Count: count,
+			Users: entities,
+			MID:   req.MID,
+		}, nil
+	}
+}
+
+func UserListNameHandler() http.Handler {
+	return httptransport.NewServer(
+		makeUserListNameendPoint(),
+		decodeUserListNameRequest,
+		utils.EncodeResponse,
+		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+	)
+}
+
+type userFindRequest struct {
+	ID  string
+	MID string
+}
+
+type userFindResponse struct {
+	userEntity
+	MID string `json:"mid"`
+}
+
+func decodeUserFindRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	id := vars["id"]
+	mid := r.URL.Query().Get("mid")
+	dto := &userFindRequest{
+		ID:  id,
+		MID: mid,
+	}
+	return dto, nil
+}
+
+func makeUserFindendPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userFindRequest)
+		if !ok {
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1008, errors.New("invalid request"), "na")
+		}
+
+		service := service.NewUserService()
+		user, err := service.Find(req.ID)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1009, err, req.MID)
+		}
+
+		return &userFindResponse{
+			userEntity: userEntity{
+				PersonID:  user.PersonID,
+				UserID:    user.UserID,
+				Name:      user.Name,
+				Telephone: user.Telephone,
+				Nick:      user.Nick,
+				Email:     user.Email,
+				Kind:      user.Kind,
+			},
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UserFindHandler() http.Handler {
+	return httptransport.NewServer(
+		makeUserFindendPoint(),
+		decodeUserFindRequest,
 		utils.EncodeResponse,
 		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
 	)

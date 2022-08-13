@@ -4,7 +4,7 @@ import "time"
 
 type Access struct {
 	Token     string
-	UserId    string
+	UserID    string
 	ExpiredAt time.Time
 	IsBlocked time.Time
 }

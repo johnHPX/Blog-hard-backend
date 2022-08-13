@@ -11,6 +11,9 @@ type userServiceInterface interface {
 	Store(name, telephone, nick, email, secret, kind string) error
 	List(offset, limit, page int) ([]model.User, error)
 	Count() (int, error)
+	ListName(name string, offset, limit, page int) ([]model.User, error)
+	CountName(name string) (int, error)
+	Find(id string) (*model.User, error)
 }
 
 type userServiceImpl struct{}
@@ -92,6 +95,35 @@ func (s *userServiceImpl) Count() (int, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+func (s *userServiceImpl) ListName(name string, offset, limit, page int) ([]model.User, error) {
+	repUser := repository.NewUserRepository()
+	entities, err := repUser.ListName(name, offset, limit, page)
+	if err != nil {
+		return nil, err
+	}
+
+	return entities, nil
+}
+
+func (s *userServiceImpl) CountName(name string) (int, error) {
+	repUser := repository.NewUserRepository()
+	count, err := repUser.CountListName(name)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
+}
+
+func (s *userServiceImpl) Find(id string) (*model.User, error) {
+	repUser := repository.NewUserRepository()
+	user, err := repUser.Find(id)
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func NewUserService() userServiceInterface {

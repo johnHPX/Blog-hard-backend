@@ -11,7 +11,7 @@ RUN go mod download
 RUN go mod verify
 
 # gerando um binario da aplicação
-RUN go build -o /server cmd/webapi/main.go
+RUN go build -o /server cmd/api/main.go
 
 # imagem scratch, para redução do dockerfile
 FROM scratch

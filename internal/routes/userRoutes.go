@@ -19,4 +19,16 @@ var userRoutes = []Router{
 		EndPointer: resource.UserListHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},
+	{
+		TokenIsReq: false,
+		Path:       "/user/list/name/{name}",
+		EndPointer: resource.UserListNameHandler().ServeHTTP,
+		Method:     http.MethodGet,
+	},
+	{
+		TokenIsReq: false,
+		Path:       "/user/find/id/{id}",
+		EndPointer: resource.UserFindHandler().ServeHTTP,
+		Method:     http.MethodGet,
+	},
 }
