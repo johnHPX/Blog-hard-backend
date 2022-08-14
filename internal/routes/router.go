@@ -26,11 +26,12 @@ type webServiceImpl struct {
 func (s *webServiceImpl) configuration() {
 	routers := []Router{}
 	routers = append(routers, userRoutes...)
+	routers = append(routers, postRoutes...)
 	for _, router := range routers {
 		if router.TokenIsReq {
-			s.Router.HandleFunc(router.Path, utils.Logger(utils.Authenticate(router.EndPointer), router.Method))
+			s.Router.HandleFunc(router.Path, utils.HeaderMethods(utils.Authenticate(router.EndPointer), router.Method))
 		}
-		s.Router.HandleFunc(router.Path, utils.Logger(router.EndPointer, router.Method))
+		s.Router.HandleFunc(router.Path, utils.HeaderMethods(router.EndPointer, router.Method))
 	}
 }
 

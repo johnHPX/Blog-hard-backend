@@ -46,10 +46,8 @@ func makeUserStoreendPoint() endpoint.Endpoint {
 			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1000, errors.New("invalid request"), "na")
 		}
 
-		service := service.NewUserService()
-
+		service := service.NewUserService("", "")
 		err := service.Store(req.Name, req.Telephone, req.Nick, req.Email, req.Secret, req.Kind)
-
 		if err != nil {
 			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1001, err, req.MID)
 		}
@@ -80,10 +78,11 @@ type userEntity struct {
 }
 
 type userListRequest struct {
-	Offset int
-	Limit  int
-	Page   int
-	MID    string
+	Offset  int
+	Limit   int
+	Page    int
+	MID     string
+	Request *http.Request
 }
 
 type userListResponse struct {
@@ -107,10 +106,11 @@ func decodeUserListRequest(ctx context.Context, r *http.Request) (interface{}, e
 	}
 	mid := r.URL.Query().Get("mid")
 	dto := &userListRequest{
-		Offset: int(offset),
-		Limit:  int(limit),
-		Page:   int(page),
-		MID:    mid,
+		Offset:  int(offset),
+		Limit:   int(limit),
+		Page:    int(page),
+		MID:     mid,
+		Request: r,
 	}
 	return dto, nil
 }
@@ -123,16 +123,22 @@ func makeUserListendPoint() endpoint.Endpoint {
 			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1002, errors.New("invalid request"), "na")
 		}
 
-		service := service.NewUserService()
+		// gets token's informations
+		userToken, err := utils.ExtractUserID(req.Request)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1003, err, req.MID)
+		}
+
+		service := service.NewUserService(userToken.UserID, userToken.Kind)
 		users, err := service.List(req.Offset, req.Limit, req.Page)
 
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1003, err, req.MID)
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1004, err, req.MID)
 		}
 
 		count, err := service.Count()
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1004, err, req.MID)
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1005, err, req.MID)
 		}
 
 		var entities []userEntity
@@ -166,11 +172,12 @@ func UserListHandler() http.Handler {
 }
 
 type userListNameRequest struct {
-	Name   string
-	Offset int
-	Limit  int
-	Page   int
-	MID    string
+	Name    string
+	Offset  int
+	Limit   int
+	Page    int
+	MID     string
+	Request *http.Request
 }
 
 type userListNameResponse struct {
@@ -196,11 +203,12 @@ func decodeUserListNameRequest(ctx context.Context, r *http.Request) (interface{
 	}
 	mid := r.URL.Query().Get("mid")
 	dto := &userListNameRequest{
-		Name:   name,
-		Offset: int(offset),
-		Limit:  int(limit),
-		Page:   int(page),
-		MID:    mid,
+		Name:    name,
+		Offset:  int(offset),
+		Limit:   int(limit),
+		Page:    int(page),
+		MID:     mid,
+		Request: r,
 	}
 	return dto, nil
 }
@@ -210,19 +218,26 @@ func makeUserListNameendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userListNameRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1005, errors.New("invalid request"), "na")
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1006, errors.New("invalid request"), "na")
 		}
 
-		service := service.NewUserService()
+		// gets token's informations
+		var r *http.Request
+		userToken, err := utils.ExtractUserID(r)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1007, err, req.MID)
+		}
+
+		service := service.NewUserService(userToken.UserID, userToken.Kind)
 		users, err := service.ListName(req.Name, req.Offset, req.Limit, req.Page)
 
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1006, err, req.MID)
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1008, err, req.MID)
 		}
 
 		count, err := service.CountName(req.Name)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1007, err, req.MID)
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1009, err, req.MID)
 		}
 
 		var entities []userEntity
@@ -256,8 +271,9 @@ func UserListNameHandler() http.Handler {
 }
 
 type userFindRequest struct {
-	ID  string
-	MID string
+	ID      string
+	MID     string
+	Request *http.Request
 }
 
 type userFindResponse struct {
@@ -270,8 +286,9 @@ func decodeUserFindRequest(ctx context.Context, r *http.Request) (interface{}, e
 	id := vars["id"]
 	mid := r.URL.Query().Get("mid")
 	dto := &userFindRequest{
-		ID:  id,
-		MID: mid,
+		ID:      id,
+		MID:     mid,
+		Request: r,
 	}
 	return dto, nil
 }
@@ -281,13 +298,20 @@ func makeUserFindendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userFindRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1008, errors.New("invalid request"), "na")
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1010, errors.New("invalid request"), "na")
 		}
 
-		service := service.NewUserService()
+		// gets token's informations
+		var r *http.Request
+		userToken, err := utils.ExtractUserID(r)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1011, err, req.MID)
+		}
+
+		service := service.NewUserService(userToken.UserID, userToken.Kind)
 		user, err := service.Find(req.ID)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1009, err, req.MID)
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1012, err, req.MID)
 		}
 
 		return &userFindResponse{
@@ -322,6 +346,7 @@ type userUpdateRequest struct {
 	Email     string `json:"email"`
 	Kind      string `json:"kind"`
 	MID       string `json:"mid"`
+	Request   *http.Request
 }
 
 type userUpdateResponse struct {
@@ -338,6 +363,7 @@ func decodeUserUpdateRequest(ctx context.Context, r *http.Request) (interface{},
 		return nil, err
 	}
 	dto.ID = id
+	dto.Request = r
 	return dto, nil
 }
 
@@ -346,13 +372,20 @@ func makeUserUpdateendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userUpdateRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1010, errors.New("invalid request"), "na")
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1013, errors.New("invalid request"), "na")
 		}
 
-		service := service.NewUserService()
-		err := service.Update(req.ID, req.Name, req.Telephone, req.Nick, req.Email, req.Kind)
+		// gets token's informations
+		var r *http.Request
+		userToken, err := utils.ExtractUserID(r)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1011, err, req.MID)
+			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1014, err, req.MID)
+		}
+
+		service := service.NewUserService(userToken.UserID, userToken.Kind)
+		err = service.Update(req.ID, req.Name, req.Telephone, req.Nick, req.Email, req.Kind)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1015, err, req.MID)
 		}
 
 		return &userUpdateResponse{
@@ -371,8 +404,9 @@ func UserUpdateHandler() http.Handler {
 }
 
 type userRemoveRequest struct {
-	ID  string
-	MID string
+	ID      string
+	MID     string
+	Request *http.Request
 }
 
 type userRemoveResponse struct {
@@ -384,8 +418,9 @@ func decodeUserRemoveRequest(ctx context.Context, r *http.Request) (interface{},
 	id := vars["id"]
 	mid := r.URL.Query().Get("mid")
 	dto := &userRemoveRequest{
-		ID:  id,
-		MID: mid,
+		ID:      id,
+		MID:     mid,
+		Request: r,
 	}
 	return dto, nil
 }
@@ -395,13 +430,20 @@ func makeUserRemoveendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userRemoveRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1012, errors.New("invalid request"), "na")
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1016, errors.New("invalid request"), "na")
 		}
 
-		service := service.NewUserService()
-		err := service.Remove(req.ID)
+		// gets token's informations
+		var r *http.Request
+		userToken, err := utils.ExtractUserID(r)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1013, err, req.MID)
+			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1017, err, req.MID)
+		}
+
+		service := service.NewUserService(userToken.UserID, userToken.Kind)
+		err = service.Remove(req.ID)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1018, err, req.MID)
 		}
 
 		return &userRemoveResponse{
@@ -414,6 +456,57 @@ func UserRemoveHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserRemoveendPoint(),
 		decodeUserRemoveRequest,
+		utils.EncodeResponse,
+		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+	)
+}
+
+type userLoginRequest struct {
+	EmailOrNick string `json:"nick"`
+	Secret      string `json:"password"`
+	MID         string `json:"mid"`
+}
+
+type userLoginResponse struct {
+	Token string `json:"token"`
+	MID   string `json:"mid"`
+}
+
+func decodeUserLoginRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	dto := new(userLoginRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	return dto, nil
+}
+
+func makeUserLoginendPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userLoginRequest)
+		if !ok {
+			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1019, errors.New("invalid request"), "na")
+		}
+
+		service := service.NewUserService("", "")
+		token, err := service.Login(req.EmailOrNick, req.Secret)
+		if err != nil {
+			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1020, err, req.MID)
+		}
+
+		return &userLoginResponse{
+			Token: token,
+			MID:   req.MID,
+		}, nil
+	}
+}
+
+func UserLoginHandler() http.Handler {
+	return httptransport.NewServer(
+		makeUserLoginendPoint(),
+		decodeUserLoginRequest,
 		utils.EncodeResponse,
 		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
 	)

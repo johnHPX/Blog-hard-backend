@@ -1,9 +1,12 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
+	"github.com/johnHPX/blog-hard-backend/internal/utils"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
@@ -16,9 +19,13 @@ type userServiceInterface interface {
 	Find(id string) (*model.User, error)
 	Update(id, name, telefone, nick, email, kind string) error
 	Remove(id string) error
+	Login(emailOrNick, secret string) (string, error)
 }
 
-type userServiceImpl struct{}
+type userServiceImpl struct {
+	UserID string
+	Kind   string
+}
 
 func (s *userServiceImpl) Store(name, telephone, nick, email, secret, kind string) error {
 
@@ -48,6 +55,21 @@ func (s *userServiceImpl) Store(name, telephone, nick, email, secret, kind strin
 		return err
 	}
 
+	Kind = "user"
+
+	repUser := repository.NewUserRepository()
+	repPerson := repository.NewPersonRepository()
+
+	err = repUser.CheckEmail(Email.(string))
+	if err != nil {
+		return err
+	}
+
+	err = repUser.CheckNick(Nick.(string))
+	if err != nil {
+		return err
+	}
+
 	uid := uuid.New()
 	pid := uuid.New()
 
@@ -64,9 +86,6 @@ func (s *userServiceImpl) Store(name, telephone, nick, email, secret, kind strin
 		Kind:   Kind.(string),
 	}
 
-	repUser := repository.NewUserRepository()
-	repPerson := repository.NewPersonRepository()
-
 	err = repUser.Store(e)
 	if err != nil {
 		return err
@@ -81,6 +100,11 @@ func (s *userServiceImpl) Store(name, telephone, nick, email, secret, kind strin
 }
 
 func (s *userServiceImpl) List(offset, limit, page int) ([]model.User, error) {
+
+	if s.Kind != "adm" {
+		return nil, errors.New("Seu Usuário Não é o Admin")
+	}
+
 	repUser := repository.NewUserRepository()
 	entities, err := repUser.List(offset, limit, page)
 	if err != nil {
@@ -91,6 +115,11 @@ func (s *userServiceImpl) List(offset, limit, page int) ([]model.User, error) {
 }
 
 func (s *userServiceImpl) Count() (int, error) {
+
+	if s.Kind != "adm" {
+		return 0, errors.New("Seu Usuário Não é o Admin")
+	}
+
 	repUser := repository.NewUserRepository()
 	count, err := repUser.Count()
 	if err != nil {
@@ -100,6 +129,11 @@ func (s *userServiceImpl) Count() (int, error) {
 }
 
 func (s *userServiceImpl) ListName(name string, offset, limit, page int) ([]model.User, error) {
+
+	if s.Kind != "adm" {
+		return nil, errors.New("Seu Usuário Não é o Admin")
+	}
+
 	repUser := repository.NewUserRepository()
 	entities, err := repUser.ListName(name, offset, limit, page)
 	if err != nil {
@@ -110,6 +144,11 @@ func (s *userServiceImpl) ListName(name string, offset, limit, page int) ([]mode
 }
 
 func (s *userServiceImpl) CountName(name string) (int, error) {
+
+	if s.Kind != "adm" {
+		return 0, errors.New("Seu Usuário Não é o Admin")
+	}
+
 	repUser := repository.NewUserRepository()
 	count, err := repUser.CountListName(name)
 	if err != nil {
@@ -119,6 +158,11 @@ func (s *userServiceImpl) CountName(name string) (int, error) {
 }
 
 func (s *userServiceImpl) Find(id string) (*model.User, error) {
+
+	if s.UserID != id {
+		return nil, errors.New("Não pode buscar dados de outro usuario")
+	}
+
 	repUser := repository.NewUserRepository()
 	user, err := repUser.Find(id)
 	if err != nil {
@@ -129,6 +173,11 @@ func (s *userServiceImpl) Find(id string) (*model.User, error) {
 }
 
 func (s *userServiceImpl) Update(id, name, telefone, nick, email, kind string) error {
+
+	if s.UserID != id {
+		return errors.New("Não pode atualizar Dados De outro usuario")
+	}
+
 	val := validator.NewValidator()
 	NameVal, err := val.CheckAnyData("nome", 255, name, true)
 	if err != nil {
@@ -150,6 +199,8 @@ func (s *userServiceImpl) Update(id, name, telefone, nick, email, kind string) e
 	if err != nil {
 		return err
 	}
+
+	KindVal = "user"
 
 	// repositorys
 	repUser := repository.NewUserRepository()
@@ -186,6 +237,11 @@ func (s *userServiceImpl) Update(id, name, telefone, nick, email, kind string) e
 }
 
 func (s *userServiceImpl) Remove(id string) error {
+
+	if s.UserID != id {
+		return errors.New("Não pode deletar Dados De outro usuario")
+	}
+
 	// repositorys
 	repUser := repository.NewUserRepository()
 	repPerson := repository.NewPersonRepository()
@@ -211,6 +267,40 @@ func (s *userServiceImpl) Remove(id string) error {
 	return nil
 }
 
-func NewUserService() userServiceInterface {
-	return &userServiceImpl{}
+func (s *userServiceImpl) Login(emailOrNick, secret string) (string, error) {
+	val := validator.NewValidator()
+	EmailOrNickVal, err := val.CheckAnyData("email ou nick", 255, emailOrNick, true)
+	if err != nil {
+		return "", err
+	}
+
+	// repository
+	repUser := repository.NewUserRepository()
+
+	// finding user by email or nick
+	user, err := repUser.FindByEmailOrNick(EmailOrNickVal.(string))
+	if err != nil {
+		return "", err
+	}
+
+	// checking if the password is correct
+	_, err = val.CheckPassword(255, secret, user.Secret, "compare")
+	if err != nil {
+		return "", err
+	}
+
+	// create a token for this user
+	token, err := utils.CreateToken(user.UserID, user.Kind)
+	if err != nil {
+		return "", err
+	}
+
+	return token, nil
+}
+
+func NewUserService(userID, kind string) userServiceInterface {
+	return &userServiceImpl{
+		UserID: userID,
+		Kind:   kind,
+	}
 }

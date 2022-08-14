@@ -1,38 +1,25 @@
 package utils
 
 import (
-	"crypto/rand"
-	"encoding/base64"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
 	jwt "github.com/dgrijalva/jwt-go"
 )
 
-var secretKey string
+var SecretKey = "X46LJy3eytWRGQlVFXGqVXC/QUnI/OcVtIPpzCtpPdySMOs9PGfTqanJ5Ri3RVPugjA3BwW0hW4H8LveAoRhLw=="
 
-func init() {
-	key := make([]byte, 64)
-
-	if _, err := rand.Read(key); err != nil {
-		log.Fatal(err)
-	}
-
-	secretKey = base64.StdEncoding.EncodeToString(key)
-}
-
-func CreateToken(userID int64) (string, error) {
+func CreateToken(userID, kind string) (string, error) {
 	permissions := jwt.MapClaims{}
 	permissions["authorized"] = true
-	permissions["exp"] = time.Now().Add(time.Hour * 6).Unix()
-	permissions["userId"] = userID
+	permissions["exp"] = time.Now().Add(time.Hour * 4).Unix()
+	permissions["userID"] = userID
+	permissions["kind"] = kind
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissions)
-	return token.SignedString([]byte(secretKey))
+	return token.SignedString([]byte(SecretKey))
 }
 
 func validateToken(r *http.Request) error {
@@ -49,40 +36,44 @@ func validateToken(r *http.Request) error {
 	return errors.New("token invalido")
 }
 
-func ExtractUserID(r *http.Request) (int64, error) {
+type userToken struct {
+	UserID string
+	Kind   string
+}
+
+func ExtractUserID(r *http.Request) (userToken, error) {
 	tokenString := ExtractToken(r)
 	token, err := jwt.Parse(tokenString, returnCheckKey)
 	if err != nil {
-		return 0, err
+		return userToken{}, err
 	}
 
 	if permissions, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
-		userID, err := strconv.ParseInt(fmt.Sprintf("%.0f", permissions["userId"]), 10, 64)
-		if err != nil {
-			return 0, err
-		}
+		userID := permissions["userID"]
+		kind := permissions["kind"]
 
-		return userID, nil
+		return userToken{
+			UserID: userID.(string),
+			Kind:   kind.(string),
+		}, nil
 	}
 
-	return 0, errors.New("token inválido")
+	return userToken{}, errors.New("token inválido")
 }
 
 func ExtractToken(r *http.Request) string {
 	token := r.Header.Get("Authorization")
-
 	// Bearer asdlkdjsakl -> asdlkdjsakl
-
 	if len(strings.Split(token, " ")) == 2 {
 		return strings.Split(token, " ")[1]
 	}
 
-	return ""
+	return token
 }
 func returnCheckKey(token *jwt.Token) (interface{}, error) {
 	if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, fmt.Errorf("método de assinatura inesperado! %v", token.Header["alg"])
 	}
 
-	return secretKey, nil
+	return []byte(SecretKey), nil
 }

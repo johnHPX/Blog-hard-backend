@@ -18,11 +18,14 @@ type userRepositoryInterface interface {
 	Find(id string) (*model.User, error)
 	Update(user *model.User) error
 	Remove(id string) error
+	CheckEmail(email string) error
+	CheckNick(nick string) error
+	FindByEmailOrNick(emailOrNick string) (*model.User, error)
 }
 
 type userRepositoryImpl struct{}
 
-func (r *userRepositoryImpl) scanIterator(rows *sql.Rows) (*model.User, error) {
+func (r *userRepositoryImpl) scanIterator(rows *sql.Rows, secretIsReq bool) (*model.User, error) {
 	userID := sql.NullString{}
 	personID := sql.NullString{}
 	name := sql.NullString{}
@@ -30,16 +33,31 @@ func (r *userRepositoryImpl) scanIterator(rows *sql.Rows) (*model.User, error) {
 	nick := sql.NullString{}
 	email := sql.NullString{}
 	kind := sql.NullString{}
+	secret := sql.NullString{}
 
-	err := rows.Scan(
-		&userID,
-		&personID,
-		&name,
-		&telephone,
-		&nick,
-		&email,
-		&kind,
-	)
+	var err error
+	if secretIsReq {
+		err = rows.Scan(
+			&userID,
+			&personID,
+			&name,
+			&telephone,
+			&nick,
+			&email,
+			&kind,
+			&secret,
+		)
+	} else {
+		err = rows.Scan(
+			&userID,
+			&personID,
+			&name,
+			&telephone,
+			&nick,
+			&email,
+			&kind,
+		)
+	}
 
 	if err != nil {
 		return nil, err
@@ -75,7 +93,67 @@ func (r *userRepositoryImpl) scanIterator(rows *sql.Rows) (*model.User, error) {
 		userEntity.Kind = kind.String
 	}
 
+	if secretIsReq {
+		if secret.Valid {
+			userEntity.Secret = secret.String
+		}
+	}
+
 	return userEntity, nil
+}
+
+func (r *userRepositoryImpl) CheckEmail(email string) error {
+	db, err := utils.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	sqlText := `
+	select
+	 	email
+	from tb_user
+	where email = $1
+	`
+
+	row, err := db.Query(sqlText, email)
+	if err != nil {
+		return err
+	}
+	defer row.Close()
+
+	if row.Next() {
+		return errors.New("this email is already registered")
+	}
+
+	return nil
+}
+
+func (r *userRepositoryImpl) CheckNick(nick string) error {
+	db, err := utils.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	sqlText := `
+	select
+	 	nick
+	from tb_user
+	where nick = $1
+	`
+
+	row, err := db.Query(sqlText, nick)
+	if err != nil {
+		return err
+	}
+	defer row.Close()
+
+	if row.Next() {
+		return errors.New("this nick is already registered")
+	}
+
+	return nil
 }
 
 func (r *userRepositoryImpl) Store(entity *model.User) error {
@@ -139,7 +217,7 @@ func (r *userRepositoryImpl) List(offset, limit, page int) ([]model.User, error)
 
 	entities := make([]model.User, 0)
 	for rows.Next() {
-		e, err := r.scanIterator(rows)
+		e, err := r.scanIterator(rows, false)
 		if err != nil {
 			return nil, err
 		}
@@ -207,7 +285,7 @@ func (r *userRepositoryImpl) ListName(name string, offset, limit, page int) ([]m
 
 	entities := make([]model.User, 0)
 	for rows.Next() {
-		e, err := r.scanIterator(rows)
+		e, err := r.scanIterator(rows, false)
 		if err != nil {
 			return nil, err
 		}
@@ -276,7 +354,7 @@ func (r *userRepositoryImpl) Find(id string) (*model.User, error) {
 	defer row.Close()
 
 	if row.Next() {
-		user, err := r.scanIterator(row)
+		user, err := r.scanIterator(row, false)
 		if err != nil {
 			return nil, err
 		}
@@ -353,6 +431,46 @@ func (r *userRepositoryImpl) Remove(id string) error {
 	}
 
 	return nil
+}
+
+func (r *userRepositoryImpl) FindByEmailOrNick(emailOrNick string) (*model.User, error) {
+	db, err := utils.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	sqlText := `
+	select 
+		u.id,
+		p.id,
+		p.name,
+		p.telephone,
+		u.nick,
+		u.email,
+		u.kind,
+		u.secret
+	FROM tb_person p
+	INNER JOIN tb_user u ON u.id = p.user_uid
+	WHERE p.deleted_at is null and u.deleted_at is null
+		 and (email = $1 or nick = $1)
+	`
+
+	row, err := db.Query(sqlText, emailOrNick)
+	if err != nil {
+		return nil, err
+	}
+	defer row.Close()
+
+	if row.Next() {
+		user, err := r.scanIterator(row, true)
+		if err != nil {
+			return nil, err
+		}
+		return user, nil
+	}
+
+	return nil, errors.New("This user does not exist")
 }
 
 func NewUserRepository() userRepositoryInterface {
