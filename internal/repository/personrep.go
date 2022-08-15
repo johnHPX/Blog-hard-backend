@@ -4,7 +4,7 @@ import (
 	"errors"
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
-	"github.com/johnHPX/blog-hard-backend/internal/utils"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
 )
 
 type personRepositoryInterface interface {
@@ -16,7 +16,7 @@ type personRepositoryInterface interface {
 type personRepositoryImpl struct{}
 
 func (r *personRepositoryImpl) Store(entity *model.Person, userID string) error {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return err
 	}
@@ -48,7 +48,7 @@ func (r *personRepositoryImpl) Store(entity *model.Person, userID string) error 
 }
 
 func (r *personRepositoryImpl) Update(entity *model.Person) error {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return err
 	}
@@ -84,7 +84,7 @@ func (r *personRepositoryImpl) Update(entity *model.Person) error {
 }
 
 func (r *personRepositoryImpl) Remove(id string) error {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return err
 	}

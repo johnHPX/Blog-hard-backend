@@ -11,7 +11,7 @@ import (
 	httptransport "github.com/go-kit/kit/transport/http"
 	"github.com/gorilla/mux"
 	"github.com/johnHPX/blog-hard-backend/internal/controller/service"
-	"github.com/johnHPX/blog-hard-backend/internal/utils"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/responseAPI"
 )
 
 type userStoreResquest struct {
@@ -43,13 +43,13 @@ func makeUserStoreendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userStoreResquest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1000, errors.New("invalid request"), "na")
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1000, errors.New("invalid request"), "na")
 		}
 
 		service := service.NewUserService("", "")
 		err := service.Store(req.Name, req.Telephone, req.Nick, req.Email, req.Secret, req.Kind)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1001, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1001, err, req.MID)
 		}
 
 		return &userStoreResponse{
@@ -62,8 +62,8 @@ func UserStoreHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserStoreendPoint(),
 		decodeUserStoreRequest,
-		utils.EncodeResponse,
-		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }
 
@@ -120,25 +120,26 @@ func makeUserListendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userListRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1002, errors.New("invalid request"), "na")
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1002, errors.New("invalid request"), "na")
 		}
 
 		// gets token's informations
-		userToken, err := utils.ExtractUserID(req.Request)
+		tokenFunc := service.NewAccessService()
+		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1003, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1003, err, req.MID)
 		}
 
 		service := service.NewUserService(userToken.UserID, userToken.Kind)
 		users, err := service.List(req.Offset, req.Limit, req.Page)
 
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1004, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1004, err, req.MID)
 		}
 
 		count, err := service.Count()
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1005, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1005, err, req.MID)
 		}
 
 		var entities []userEntity
@@ -166,8 +167,8 @@ func UserListHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserListendPoint(),
 		decodeUserListRequest,
-		utils.EncodeResponse,
-		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }
 
@@ -218,26 +219,26 @@ func makeUserListNameendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userListNameRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1006, errors.New("invalid request"), "na")
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1006, errors.New("invalid request"), "na")
 		}
 
 		// gets token's informations
-		var r *http.Request
-		userToken, err := utils.ExtractUserID(r)
+		tokenFunc := service.NewAccessService()
+		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1007, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1007, err, req.MID)
 		}
 
 		service := service.NewUserService(userToken.UserID, userToken.Kind)
 		users, err := service.ListName(req.Name, req.Offset, req.Limit, req.Page)
 
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1008, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1008, err, req.MID)
 		}
 
 		count, err := service.CountName(req.Name)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1009, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1009, err, req.MID)
 		}
 
 		var entities []userEntity
@@ -265,8 +266,8 @@ func UserListNameHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserListNameendPoint(),
 		decodeUserListNameRequest,
-		utils.EncodeResponse,
-		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }
 
@@ -298,20 +299,20 @@ func makeUserFindendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userFindRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1010, errors.New("invalid request"), "na")
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1010, errors.New("invalid request"), "na")
 		}
 
 		// gets token's informations
-		var r *http.Request
-		userToken, err := utils.ExtractUserID(r)
+		tokenFunc := service.NewAccessService()
+		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1011, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1011, err, req.MID)
 		}
 
 		service := service.NewUserService(userToken.UserID, userToken.Kind)
 		user, err := service.Find(req.ID)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1012, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1012, err, req.MID)
 		}
 
 		return &userFindResponse{
@@ -333,8 +334,8 @@ func UserFindHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserFindendPoint(),
 		decodeUserFindRequest,
-		utils.EncodeResponse,
-		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }
 
@@ -372,20 +373,20 @@ func makeUserUpdateendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userUpdateRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1013, errors.New("invalid request"), "na")
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1013, errors.New("invalid request"), "na")
 		}
 
 		// gets token's informations
-		var r *http.Request
-		userToken, err := utils.ExtractUserID(r)
+		tokenFunc := service.NewAccessService()
+		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1014, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1014, err, req.MID)
 		}
 
 		service := service.NewUserService(userToken.UserID, userToken.Kind)
 		err = service.Update(req.ID, req.Name, req.Telephone, req.Nick, req.Email, req.Kind)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1015, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1015, err, req.MID)
 		}
 
 		return &userUpdateResponse{
@@ -398,8 +399,8 @@ func UserUpdateHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserUpdateendPoint(),
 		decodeUserUpdateRequest,
-		utils.EncodeResponse,
-		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }
 
@@ -430,20 +431,20 @@ func makeUserRemoveendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userRemoveRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1016, errors.New("invalid request"), "na")
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1016, errors.New("invalid request"), "na")
 		}
 
 		// gets token's informations
-		var r *http.Request
-		userToken, err := utils.ExtractUserID(r)
+		tokenFunc := service.NewAccessService()
+		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusUnauthorized, 1017, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1017, err, req.MID)
 		}
 
 		service := service.NewUserService(userToken.UserID, userToken.Kind)
 		err = service.Remove(req.ID)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1018, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1018, err, req.MID)
 		}
 
 		return &userRemoveResponse{
@@ -456,8 +457,8 @@ func UserRemoveHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserRemoveendPoint(),
 		decodeUserRemoveRequest,
-		utils.EncodeResponse,
-		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }
 
@@ -487,13 +488,13 @@ func makeUserLoginendPoint() endpoint.Endpoint {
 		// retrieve request data
 		req, ok := request.(*userLoginRequest)
 		if !ok {
-			return nil, utils.CreateHttpErrorResponse(http.StatusBadRequest, 1019, errors.New("invalid request"), "na")
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1019, errors.New("invalid request"), "na")
 		}
 
 		service := service.NewUserService("", "")
 		token, err := service.Login(req.EmailOrNick, req.Secret)
 		if err != nil {
-			return nil, utils.CreateHttpErrorResponse(http.StatusInternalServerError, 1020, err, req.MID)
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1020, err, req.MID)
 		}
 
 		return &userLoginResponse{
@@ -507,7 +508,7 @@ func UserLoginHandler() http.Handler {
 	return httptransport.NewServer(
 		makeUserLoginendPoint(),
 		decodeUserLoginRequest,
-		utils.EncodeResponse,
-		httptransport.ServerErrorEncoder(utils.ErrorEncoder()),
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }

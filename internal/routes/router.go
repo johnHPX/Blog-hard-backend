@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/johnHPX/blog-hard-backend/internal/utils"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/authn"
 )
 
 type Router struct {
@@ -29,9 +29,9 @@ func (s *webServiceImpl) configuration() {
 	routers = append(routers, postRoutes...)
 	for _, router := range routers {
 		if router.TokenIsReq {
-			s.Router.HandleFunc(router.Path, utils.HeaderMethods(utils.Authenticate(router.EndPointer), router.Method))
+			s.Router.HandleFunc(router.Path, authn.HeaderMethods(authn.Authenticate(router.EndPointer), router.Method))
 		}
-		s.Router.HandleFunc(router.Path, utils.HeaderMethods(router.EndPointer, router.Method))
+		s.Router.HandleFunc(router.Path, authn.HeaderMethods(router.EndPointer, router.Method))
 	}
 }
 

@@ -9,12 +9,12 @@ import (
 
 	"github.com/gorilla/handlers"
 	"github.com/johnHPX/blog-hard-backend/internal/routes"
-	"github.com/johnHPX/blog-hard-backend/internal/utils"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/configsAPI"
 )
 
 func main() {
 	log.Println("Initializing WebAPI")
-	c := utils.NewConfigs()
+	c := configsAPI.NewConfigs()
 	projectConfigs, err := c.ProjectConfigs()
 	if err != nil {
 		log.Fatal(err)

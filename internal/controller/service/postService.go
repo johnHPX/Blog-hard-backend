@@ -1,6 +1,8 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
@@ -9,11 +11,26 @@ import (
 
 type postServieInterface interface {
 	Store(title, content string) error
+	List(offset, limit, page int) ([]model.Post, error)
+	Count() (int, error)
+	Find(id string) (*model.Post, error)
+	ListTitle(title string, offeset, limit, page int) ([]model.Post, error)
+	CountTitle(title string) (int, error)
+	Update(id, title, content string) error
+	Remove(id string) error
 }
 
-type postServiceImpl struct{}
+type postServiceImpl struct {
+	UserID string
+	Kind   string
+}
 
 func (s *postServiceImpl) Store(title, content string) error {
+
+	if s.Kind != "adm" {
+		return errors.New("apenas usuario admin pode utilizar essa função")
+	}
+
 	// validator
 	val := validator.NewValidator()
 	TitleVal, err := val.CheckAnyData("titulo", 255, title, true)
@@ -46,6 +63,148 @@ func (s *postServiceImpl) Store(title, content string) error {
 	return nil
 }
 
-func NewPostService() postServieInterface {
-	return &postServiceImpl{}
+func (s *postServiceImpl) List(offset, limit, page int) ([]model.Post, error) {
+	if s.Kind != "adm" {
+		return nil, errors.New("apenas usuario admin pode utilizar essa função")
+	}
+
+	repPost := repository.NewPostRepository()
+	posts, err := repPost.List(offset, limit, page)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func (s *postServiceImpl) Count() (int, error) {
+	if s.Kind != "adm" {
+		return 0, errors.New("apenas usuario admin pode utilizar essa função")
+	}
+
+	repPost := repository.NewPostRepository()
+	count, err := repPost.Count()
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+
+}
+
+func (s *postServiceImpl) Find(id string) (*model.Post, error) {
+	if s.Kind != "adm" {
+		return nil, errors.New("apenas usuario admin pode utilizar essa função")
+	}
+
+	val := validator.NewValidator()
+	IdVal, err := val.CheckAnyData("id", 255, id, true)
+	if err != nil {
+		return nil, err
+	}
+
+	repPost := repository.NewPostRepository()
+	post, err := repPost.Find(IdVal.(string))
+	if err != nil {
+		return nil, err
+	}
+
+	return post, nil
+}
+
+func (s *postServiceImpl) ListTitle(title string, offset, limit, page int) ([]model.Post, error) {
+	if s.Kind != "adm" {
+		return nil, errors.New("apenas usuario admin pode utilizar essa função")
+	}
+	val := validator.NewValidator()
+	TitleVal, err := val.CheckAnyData("titulo", 255, title, true)
+	if err != nil {
+		return nil, err
+	}
+
+	repPost := repository.NewPostRepository()
+	posts, err := repPost.ListTitle(TitleVal.(string), offset, limit, page)
+	if err != nil {
+		return nil, err
+	}
+
+	return posts, nil
+}
+
+func (s *postServiceImpl) CountTitle(title string) (int, error) {
+	if s.Kind != "adm" {
+		return 0, errors.New("apenas usuario admin pode utilizar essa função")
+	}
+	val := validator.NewValidator()
+	TitleVal, err := val.CheckAnyData("titulo", 255, title, true)
+	if err != nil {
+		return 0, err
+	}
+
+	repPost := repository.NewPostRepository()
+	count, err := repPost.CountTitle(TitleVal.(string))
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (s *postServiceImpl) Update(id, title, content string) error {
+	if s.Kind != "adm" {
+		return errors.New("apenas usuario admin pode utilizar essa função")
+	}
+
+	val := validator.NewValidator()
+	IdVal, err := val.CheckAnyData("id", 36, id, true)
+	if err != nil {
+		return err
+	}
+	TitleVal, err := val.CheckAnyData("titulo", 255, title, true)
+	if err != nil {
+		return err
+	}
+	ContentVal, err := val.CheckAnyData("conteudo", 9999, content, true)
+	if err != nil {
+		return err
+	}
+
+	post := new(model.Post)
+	post.PostID = IdVal.(string)
+	post.Title = TitleVal.(string)
+	post.Content = ContentVal.(string)
+
+	repPost := repository.NewPostRepository()
+	err = repPost.Update(post)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *postServiceImpl) Remove(id string) error {
+	if s.Kind != "adm" {
+		return errors.New("apenas usuario admin pode utilizar essa função")
+	}
+	val := validator.NewValidator()
+	IdVal, err := val.CheckAnyData("id", 36, id, true)
+	if err != nil {
+		return err
+	}
+
+	repPost := repository.NewPostRepository()
+	err = repPost.Remove(IdVal.(string))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func NewPostService(userID, kind string) postServieInterface {
+	return &postServiceImpl{
+		UserID: userID,
+		Kind:   kind,
+	}
 }

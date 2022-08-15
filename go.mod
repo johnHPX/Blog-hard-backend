@@ -3,7 +3,6 @@ module github.com/johnHPX/blog-hard-backend
 go 1.18
 
 require (
-	github.com/docker/distribution v2.8.1+incompatible
 	github.com/golang-migrate/migrate/v4 v4.15.2
 	github.com/johnHPX/validator-hard v0.0.0-20220804212857-dd6a86225b2d
 	github.com/lib/pq v1.10.6

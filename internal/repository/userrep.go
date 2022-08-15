@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
-	"github.com/johnHPX/blog-hard-backend/internal/utils"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
 )
 
 type userRepositoryInterface interface {
@@ -103,7 +103,7 @@ func (r *userRepositoryImpl) scanIterator(rows *sql.Rows, secretIsReq bool) (*mo
 }
 
 func (r *userRepositoryImpl) CheckEmail(email string) error {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return err
 	}
@@ -130,7 +130,7 @@ func (r *userRepositoryImpl) CheckEmail(email string) error {
 }
 
 func (r *userRepositoryImpl) CheckNick(nick string) error {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return err
 	}
@@ -157,7 +157,7 @@ func (r *userRepositoryImpl) CheckNick(nick string) error {
 }
 
 func (r *userRepositoryImpl) Store(entity *model.User) error {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return err
 	}
@@ -189,7 +189,7 @@ func (r *userRepositoryImpl) Store(entity *model.User) error {
 }
 
 func (r *userRepositoryImpl) List(offset, limit, page int) ([]model.User, error) {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (r *userRepositoryImpl) List(offset, limit, page int) ([]model.User, error)
 }
 
 func (r *userRepositoryImpl) Count() (int, error) {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return 0, err
 	}
@@ -255,7 +255,7 @@ func (r *userRepositoryImpl) Count() (int, error) {
 }
 
 func (r *userRepositoryImpl) ListName(name string, offset, limit, page int) ([]model.User, error) {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return nil, err
 	}
@@ -296,7 +296,7 @@ func (r *userRepositoryImpl) ListName(name string, offset, limit, page int) ([]m
 }
 
 func (r *userRepositoryImpl) CountListName(name string) (int, error) {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return 0, err
 	}
@@ -326,7 +326,7 @@ func (r *userRepositoryImpl) CountListName(name string) (int, error) {
 }
 
 func (r *userRepositoryImpl) Find(id string) (*model.User, error) {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return nil, err
 	}
@@ -365,7 +365,7 @@ func (r *userRepositoryImpl) Find(id string) (*model.User, error) {
 }
 
 func (r *userRepositoryImpl) Update(user *model.User) error {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return err
 	}
@@ -402,7 +402,7 @@ func (r *userRepositoryImpl) Update(user *model.User) error {
 }
 
 func (r *userRepositoryImpl) Remove(id string) error {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return err
 	}
@@ -434,7 +434,7 @@ func (r *userRepositoryImpl) Remove(id string) error {
 }
 
 func (r *userRepositoryImpl) FindByEmailOrNick(emailOrNick string) (*model.User, error) {
-	db, err := utils.Connect()
+	db, err := databaseConn.Connect()
 	if err != nil {
 		return nil, err
 	}

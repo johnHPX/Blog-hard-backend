@@ -1,15 +1,16 @@
-package utils
+package databaseConn
 
 import (
 	"database/sql"
 	"fmt"
 
+	"github.com/johnHPX/blog-hard-backend/internal/utils/configsAPI"
 	_ "github.com/lib/pq"
 )
 
 // Connect: return database startement
 func Connect() (*sql.DB, error) {
-	config := NewConfigs()
+	config := configsAPI.NewConfigs()
 	database, err := config.DatabaseConfigs()
 	if err != nil {
 		return nil, err

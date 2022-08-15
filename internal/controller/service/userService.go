@@ -2,11 +2,11 @@ package service
 
 import (
 	"errors"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
-	"github.com/johnHPX/blog-hard-backend/internal/utils"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
@@ -54,8 +54,6 @@ func (s *userServiceImpl) Store(name, telephone, nick, email, secret, kind strin
 	if err != nil {
 		return err
 	}
-
-	Kind = "user"
 
 	repUser := repository.NewUserRepository()
 	repPerson := repository.NewPersonRepository()
@@ -290,12 +288,43 @@ func (s *userServiceImpl) Login(emailOrNick, secret string) (string, error) {
 	}
 
 	// create a token for this user
-	token, err := utils.CreateToken(user.UserID, user.Kind)
+	svcAccess := NewAccessService()
+	atoken, err := svcAccess.CreateAToken(user.UserID, user.Kind)
 	if err != nil {
 		return "", err
 	}
 
-	return token, nil
+	// creta a rtoken for this user
+	rtoken, err := svcAccess.CreateRToken()
+	if err != nil {
+		return "", err
+	}
+
+	// access repository
+	repAccess := repository.NewAccessRepository()
+	// verific if exists a rtoken that user
+	accessEntity, err := repAccess.FindToken(user.UserID)
+	if err == nil {
+
+		// verific if was blocked
+		if accessEntity.IsBlocked {
+			return "", errors.New("Seu usuario foi bloqueado! Não será possivel realizar sua autenticação no site")
+		}
+
+		// remove a old rtoken
+		err := repAccess.RemoveToken(user.UserID)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	// salve rtoken in database
+	err = repAccess.Store(rtoken, user.UserID, (time.Now().Add(time.Hour * 24 * 15)))
+	if err != nil {
+		return "", err
+	}
+	// return atoken
+	return atoken, nil
 }
 
 func NewUserService(userID, kind string) userServiceInterface {

@@ -1,7 +1,10 @@
-package utils
+package authn
 
 import (
 	"net/http"
+
+	"github.com/johnHPX/blog-hard-backend/internal/controller/service"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/responseAPI"
 )
 
 func HeaderMethods(next http.HandlerFunc, method string) http.HandlerFunc {
@@ -25,12 +28,24 @@ func HeaderMethods(next http.HandlerFunc, method string) http.HandlerFunc {
 
 func Authenticate(nextFunction http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		err := validateToken(r)
+		tokenFunc := service.NewAccessService()
+		err := tokenFunc.ValidateAToken(r)
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			response := CreateHttpErrorResponse(http.StatusUnauthorized, 01, err, "token is invalid")
-			EncodeResponse(nil, w, response)
-			return
+			userID, err := tokenFunc.ExtractInvalideToken(r)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				response := responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 01, err, "ti")
+				responseAPI.EncodeResponse(nil, w, response)
+				return
+			}
+			atoken, err := tokenFunc.GenerateNewToken(userID)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				response := responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 02, err, "ti")
+				responseAPI.EncodeResponse(nil, w, response)
+				return
+			}
+			r.Header.Set("Authorization", atoken)
 		}
 		nextFunction(w, r)
 	}

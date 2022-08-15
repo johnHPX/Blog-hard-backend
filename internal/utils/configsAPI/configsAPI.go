@@ -1,4 +1,4 @@
-package utils
+package configsAPI
 
 import (
 	"fmt"
@@ -35,7 +35,7 @@ type databaseConfig struct {
 	Port string
 }
 
-type service interface {
+type ServiceConfig interface {
 	ProjectConfigs() (*projectConfig, error)
 	DatabaseConfigs() (*databaseConfig, error)
 }
@@ -82,6 +82,6 @@ func (c *configsImpl) DatabaseConfigs() (*databaseConfig, error) {
 	}, nil
 }
 
-func NewConfigs() service {
+func NewConfigs() ServiceConfig {
 	return &configsImpl{}
 }
