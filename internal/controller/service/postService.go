@@ -74,7 +74,24 @@ func (s *postServiceImpl) List(offset, limit, page int) ([]model.Post, error) {
 		return nil, err
 	}
 
-	return posts, nil
+	repNumberLikes := repository.NewNumberLikerRepository()
+
+	entities := make([]model.Post, 0)
+	for _, v := range posts {
+		countLikes, err := repNumberLikes.CountLikes(v.PostID)
+		if err != nil {
+			return nil, err
+		}
+
+		entities = append(entities, model.Post{
+			PostID:  v.PostID,
+			Title:   v.Title,
+			Content: v.Content,
+			Likes:   countLikes,
+		})
+	}
+
+	return entities, nil
 }
 
 func (s *postServiceImpl) Count() (int, error) {
@@ -109,6 +126,14 @@ func (s *postServiceImpl) Find(id string) (*model.Post, error) {
 		return nil, err
 	}
 
+	repNumberLikes := repository.NewNumberLikerRepository()
+	countLikes, err := repNumberLikes.CountLikes(post.PostID)
+	if err != nil {
+		return nil, err
+	}
+
+	post.Likes = countLikes
+
 	return post, nil
 }
 
@@ -128,7 +153,24 @@ func (s *postServiceImpl) ListTitle(title string, offset, limit, page int) ([]mo
 		return nil, err
 	}
 
-	return posts, nil
+	repNumberLikes := repository.NewNumberLikerRepository()
+
+	entities := make([]model.Post, 0)
+	for _, v := range posts {
+		countLikes, err := repNumberLikes.CountLikes(v.PostID)
+		if err != nil {
+			return nil, err
+		}
+
+		entities = append(entities, model.Post{
+			PostID:  v.PostID,
+			Title:   v.Title,
+			Content: v.Content,
+			Likes:   countLikes,
+		})
+	}
+
+	return entities, nil
 }
 
 func (s *postServiceImpl) CountTitle(title string) (int, error) {

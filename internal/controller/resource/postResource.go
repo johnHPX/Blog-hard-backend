@@ -18,6 +18,7 @@ type postEntity struct {
 	PostID  string `json:"postID"`
 	Title   string `json:"title"`
 	Content string `json:"content`
+	Likes   int    `json:"likes"`
 }
 
 type postStoreRequest struct {
@@ -130,7 +131,7 @@ func makePostListEndPoint() endpoint.Endpoint {
 		}
 
 		service := service.NewPostService(userToken.UserID, userToken.Kind)
-		users, err := service.List(req.Offset, req.Limit, req.Page)
+		posts, err := service.List(req.Offset, req.Limit, req.Page)
 		if err != nil {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1005, err, req.MID)
 		}
@@ -141,11 +142,12 @@ func makePostListEndPoint() endpoint.Endpoint {
 		}
 
 		var entities []postEntity
-		for _, v := range users {
+		for _, v := range posts {
 			entities = append(entities, postEntity{
 				PostID:  v.PostID,
 				Title:   v.Title,
 				Content: v.Content,
+				Likes:   v.Likes,
 			})
 		}
 
@@ -215,6 +217,7 @@ func makePostFindendPoint() endpoint.Endpoint {
 				PostID:  post.PostID,
 				Title:   post.Title,
 				Content: post.Content,
+				Likes:   post.Likes,
 			},
 			MID: req.MID,
 		}, nil
@@ -287,7 +290,7 @@ func makePostListTitleEndPoint() endpoint.Endpoint {
 		}
 
 		service := service.NewPostService(userToken.UserID, userToken.Kind)
-		users, err := service.ListTitle(req.title, req.Offset, req.Limit, req.Page)
+		posts, err := service.ListTitle(req.title, req.Offset, req.Limit, req.Page)
 		if err != nil {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1005, err, req.MID)
 		}
@@ -298,11 +301,12 @@ func makePostListTitleEndPoint() endpoint.Endpoint {
 		}
 
 		var entities []postEntity
-		for _, v := range users {
+		for _, v := range posts {
 			entities = append(entities, postEntity{
 				PostID:  v.PostID,
 				Title:   v.Title,
 				Content: v.Content,
+				Likes:   v.Likes,
 			})
 		}
 
