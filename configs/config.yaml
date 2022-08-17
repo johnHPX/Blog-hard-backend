@@ -2,8 +2,8 @@ project:
   name: "blog-hard"
   port: "40183"
 database:
-  host: "postgresql-server-hardprox.cn62zsakc6gw.sa-east-1.rds.amazonaws.com"
-  user: "GoUser"
-  pswd: "gouser"
+  host: "localhost"
+  user: "postgres"
+  pswd: "1234567890"
   dbnm: "db-blogHard"
   port: "5432"

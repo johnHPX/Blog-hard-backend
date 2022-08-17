@@ -15,6 +15,12 @@ var userRoutes = []Router{
 	},
 	{
 		TokenIsReq: true,
+		Path:       "/user/store/adm",
+		EndPointer: resource.UserStoreADMHandler().ServeHTTP,
+		Method:     http.MethodPost,
+	},
+	{
+		TokenIsReq: true,
 		Path:       "/user/list",
 		EndPointer: resource.UserListHandler().ServeHTTP,
 		Method:     http.MethodGet,

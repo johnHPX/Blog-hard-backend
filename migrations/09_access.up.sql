@@ -6,6 +6,6 @@ create table if not exists tb_access(
     created_at timestamp not null DEFAULT Now(),
     updated_at timestamp,
     deleted_at timestamp,
-    constraint pk_access primary key (token),
+    constraint pk_access primary key (token, user_uid, created_at),
     constraint fk_access_0 foreign key (user_uid) references tb_user(id)
 )

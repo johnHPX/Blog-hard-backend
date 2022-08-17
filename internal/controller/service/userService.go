@@ -11,7 +11,8 @@ import (
 )
 
 type userServiceInterface interface {
-	Store(name, telephone, nick, email, secret, kind string) error
+	Store(name, telephone, nick, email, secret string) error
+	StoreADM(name, telephone, nick, email, secret, kind string) error
 	List(offset, limit, page int) ([]model.User, error)
 	Count() (int, error)
 	ListName(name string, offset, limit, page int) ([]model.User, error)
@@ -27,7 +28,7 @@ type userServiceImpl struct {
 	Kind   string
 }
 
-func (s *userServiceImpl) Store(name, telephone, nick, email, secret, kind string) error {
+func (s *userServiceImpl) Store(name, telephone, nick, email, secret string) error {
 
 	val := validator.NewValidator()
 	Name, err := val.CheckAnyData("nome", 255, name, true)
@@ -47,10 +48,6 @@ func (s *userServiceImpl) Store(name, telephone, nick, email, secret, kind strin
 		return err
 	}
 	Password, err := val.CheckPassword(255, secret, "", "create")
-	if err != nil {
-		return err
-	}
-	Kind, err := val.CheckAnyData("kind", 10, kind, true)
 	if err != nil {
 		return err
 	}
@@ -81,7 +78,81 @@ func (s *userServiceImpl) Store(name, telephone, nick, email, secret, kind strin
 		Nick:   Nick.(string),
 		Email:  Email.(string),
 		Secret: Password,
-		Kind:   Kind.(string),
+		Kind:   "user",
+	}
+
+	err = repUser.Store(e)
+	if err != nil {
+		return err
+	}
+
+	err = repPerson.Store(&e.Person, e.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *userServiceImpl) StoreADM(name, telephone, nick, email, secret, kind string) error {
+
+	if s.Kind != "adm" {
+		return errors.New("Essa funcionalidade só é permitida para admin do site")
+	}
+
+	val := validator.NewValidator()
+	Name, err := val.CheckAnyData("nome", 255, name, true)
+	if err != nil {
+		return err
+	}
+	Telephone, err := val.CheckAnyData("telefone", 13, telephone, true)
+	if err != nil {
+		return err
+	}
+	Nick, err := val.CheckAnyData("nick", 255, nick, true)
+	if err != nil {
+		return err
+	}
+	Email, err := val.CheckAnyData("email", 255, email, true)
+	if err != nil {
+		return err
+	}
+	Password, err := val.CheckPassword(255, secret, "", "create")
+	if err != nil {
+		return err
+	}
+	KindVal, err := val.CheckAnyData("kind", 10, kind, true)
+	if err != nil {
+		return err
+	}
+
+	repUser := repository.NewUserRepository()
+	repPerson := repository.NewPersonRepository()
+
+	err = repUser.CheckEmail(Email.(string))
+	if err != nil {
+		return err
+	}
+
+	err = repUser.CheckNick(Nick.(string))
+	if err != nil {
+		return err
+	}
+
+	uid := uuid.New()
+	pid := uuid.New()
+
+	e := &model.User{
+		UserID: uid.String(),
+		Person: model.Person{
+			PersonID:  pid.String(),
+			Name:      Name.(string),
+			Telephone: Telephone.(string),
+		},
+		Nick:   Nick.(string),
+		Email:  Email.(string),
+		Secret: Password,
+		Kind:   KindVal.(string),
 	}
 
 	err = repUser.Store(e)
@@ -198,7 +269,9 @@ func (s *userServiceImpl) Update(id, name, telefone, nick, email, kind string) e
 		return err
 	}
 
-	KindVal = "user"
+	if s.Kind != "adm" {
+		KindVal = "user"
+	}
 
 	// repositorys
 	repUser := repository.NewUserRepository()

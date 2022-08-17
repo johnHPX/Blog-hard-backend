@@ -14,13 +14,13 @@ var postRoutes = []Router{
 		Method:     http.MethodPost,
 	},
 	{
-		TokenIsReq: true,
+		TokenIsReq: false,
 		Path:       "/post/list",
 		EndPointer: resource.PostListHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},
 	{
-		TokenIsReq: true,
+		TokenIsReq: false,
 		Path:       "/post/list/title/{title}",
 		EndPointer: resource.PostListTitleHandler().ServeHTTP,
 		Method:     http.MethodGet,

@@ -64,9 +64,6 @@ func (s *postServiceImpl) Store(title, content string) error {
 }
 
 func (s *postServiceImpl) List(offset, limit, page int) ([]model.Post, error) {
-	if s.Kind != "adm" {
-		return nil, errors.New("apenas usuario admin pode utilizar essa função")
-	}
 
 	repPost := repository.NewPostRepository()
 	posts, err := repPost.List(offset, limit, page)
@@ -95,9 +92,6 @@ func (s *postServiceImpl) List(offset, limit, page int) ([]model.Post, error) {
 }
 
 func (s *postServiceImpl) Count() (int, error) {
-	if s.Kind != "adm" {
-		return 0, errors.New("apenas usuario admin pode utilizar essa função")
-	}
 
 	repPost := repository.NewPostRepository()
 	count, err := repPost.Count()
@@ -138,9 +132,6 @@ func (s *postServiceImpl) Find(id string) (*model.Post, error) {
 }
 
 func (s *postServiceImpl) ListTitle(title string, offset, limit, page int) ([]model.Post, error) {
-	if s.Kind != "adm" {
-		return nil, errors.New("apenas usuario admin pode utilizar essa função")
-	}
 	val := validator.NewValidator()
 	TitleVal, err := val.CheckAnyData("titulo", 255, title, true)
 	if err != nil {
@@ -174,9 +165,6 @@ func (s *postServiceImpl) ListTitle(title string, offset, limit, page int) ([]mo
 }
 
 func (s *postServiceImpl) CountTitle(title string) (int, error) {
-	if s.Kind != "adm" {
-		return 0, errors.New("apenas usuario admin pode utilizar essa função")
-	}
 	val := validator.NewValidator()
 	TitleVal, err := val.CheckAnyData("titulo", 255, title, true)
 	if err != nil {
