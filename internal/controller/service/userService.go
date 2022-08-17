@@ -97,7 +97,7 @@ func (s *userServiceImpl) Store(name, telephone, nick, email, secret string) err
 func (s *userServiceImpl) StoreADM(name, telephone, nick, email, secret, kind string) error {
 
 	if s.Kind != "adm" {
-		return errors.New("Essa funcionalidade só é permitida para admin do site")
+		return errors.New("Essa funcionalidade só é permitida para o admin do site")
 	}
 
 	val := validator.NewValidator()

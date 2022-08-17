@@ -29,6 +29,7 @@ func (s *webServiceImpl) configuration() {
 	routers = append(routers, postRoutes...)
 	routers = append(routers, numberLikes...)
 	routers = append(routers, commentRoutes...)
+	routers = append(routers, categoryRoutes...)
 	for _, router := range routers {
 		if router.TokenIsReq {
 			s.Router.HandleFunc(router.Path, authn.HeaderMethods(authn.Authenticate(router.EndPointer), router.Method))
