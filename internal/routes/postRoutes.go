@@ -26,6 +26,12 @@ var postRoutes = []Router{
 		Method:     http.MethodGet,
 	},
 	{
+		TokenIsReq: false,
+		Path:       "/post/list/category/name/{category}",
+		EndPointer: resource.PostListCategoryHandler().ServeHTTP,
+		Method:     http.MethodGet,
+	},
+	{
 		TokenIsReq: true,
 		Path:       "/post/find/id/{id}",
 		EndPointer: resource.PostFindHandler().ServeHTTP,

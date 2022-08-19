@@ -30,7 +30,7 @@ func Authenticate(nextFunction http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tokenFunc := service.NewAccessService()
 		err := tokenFunc.ValidateAToken(r)
-		if err != nil {
+		if err != nil && err.Error() == "Token is expired" {
 			userID, err := tokenFunc.ExtractInvalideToken(r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)

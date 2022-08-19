@@ -16,6 +16,8 @@ type postRepositoryInterface interface {
 	Find(id string) (*model.Post, error)
 	ListTitle(title string, offset, limit, page int) ([]model.Post, error)
 	CountTitle(title string) (int, error)
+	ListCategory(category string, offset, limit, page int) ([]model.Post, error)
+	CountCategory(category string) (int, error)
 	Update(post *model.Post) error
 	Remove(id string) error
 }
@@ -239,6 +241,71 @@ func (r *postRepositoryImpl) CountTitle(title string) (int, error) {
 
 	var count int
 	row := db.QueryRow(sqlText, t)
+	err = row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
+func (r *postRepositoryImpl) ListCategory(category string, offset, limit, page int) ([]model.Post, error) {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	sqlText := fmt.Sprintf(`
+	SELECT 
+		p.id,
+		p.title,
+		p.content
+	FROM tb_post p
+	INNER JOIN tb_post_category pc ON pc.post_pid = p.id
+	INNER JOIN tb_category c ON c.id = pc.category_cid
+	WHERE p.deleted_at is null and pc.deleted_at is null and c.deleted_at is null
+	and c.name = $1
+	LIMIT %v OFFSET ((%v - 1) * %v) + %v
+`, limit, page, limit, offset)
+
+	rows, err := db.Query(sqlText, category)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	posts := make([]model.Post, 0)
+	for rows.Next() {
+		post, err := r.scanIterator(rows)
+		if err != nil {
+			return nil, err
+		}
+		posts = append(posts, *post)
+	}
+
+	return posts, nil
+}
+
+func (r *postRepositoryImpl) CountCategory(category string) (int, error) {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return 0, err
+	}
+	defer db.Close()
+
+	sqlText := `
+	SELECT 
+		COUNT(*)
+	FROM tb_post p
+	INNER JOIN tb_post_category pc ON pc.post_pid = p.id
+	INNER JOIN tb_category c ON c.id = pc.category_cid
+	WHERE p.deleted_at is null and pc.deleted_at is null and c.deleted_at is null
+	 and c.name = $1
+	`
+
+	var count int
+	row := db.QueryRow(sqlText, category)
 	err = row.Scan(&count)
 	if err != nil {
 		return 0, err

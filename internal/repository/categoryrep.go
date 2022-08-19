@@ -182,7 +182,8 @@ func (r *categoryRepositoryImpl) Update(entity *model.Category) error {
 
 	sqlText := `
 		UPDATE tb_category SET
-			name = $2
+			name = $2,
+			updated_at = now()
 		WHERE deleted_at is null and id = $1
 	`
 

@@ -59,9 +59,16 @@ func (s *numberLikesServiceImpl) DislikePost(postID string) error {
 		return err
 	}
 
-	err = repNumberLikes.Remove(entity.NumberLikesID)
-	if err != nil {
-		return err
+	if entity.ValueLike {
+		err = repNumberLikes.Update(entity.NumberLikesID, false)
+		if err != nil {
+			return err
+		}
+	} else {
+		err = repNumberLikes.Update(entity.NumberLikesID, true)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

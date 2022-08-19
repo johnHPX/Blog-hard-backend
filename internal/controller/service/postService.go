@@ -16,6 +16,7 @@ type postServieInterface interface {
 	Find(id string) (*model.Post, error)
 	ListTitle(title string, offeset, limit, page int) ([]model.Post, error)
 	CountTitle(title string) (int, error)
+	ListByCategory(categoryName string, offset, limit, page int) ([]model.Post, int, error)
 	Update(id, title, content string) error
 	Remove(id string) error
 }
@@ -178,6 +179,43 @@ func (s *postServiceImpl) CountTitle(title string) (int, error) {
 	}
 
 	return count, nil
+}
+
+func (s *postServiceImpl) ListByCategory(categoryName string, offset, limit, page int) ([]model.Post, int, error) {
+	val := validator.NewValidator()
+	categoryVal, err := val.CheckAnyData("titulo", 255, categoryName, true)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	repPost := repository.NewPostRepository()
+	posts, err := repPost.ListCategory(categoryVal.(string), offset, limit, page)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	repNumberLikes := repository.NewNumberLikerRepository()
+	entities := make([]model.Post, 0)
+	for _, v := range posts {
+		countLikes, err := repNumberLikes.CountLikes(v.PostID)
+		if err != nil {
+			return nil, 0, err
+		}
+
+		entities = append(entities, model.Post{
+			PostID:  v.PostID,
+			Title:   v.Title,
+			Content: v.Content,
+			Likes:   countLikes,
+		})
+	}
+
+	count, err := repPost.CountCategory(categoryVal.(string))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return entities, count, nil
 }
 
 func (s *postServiceImpl) Update(id, title, content string) error {

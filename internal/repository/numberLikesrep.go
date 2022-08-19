@@ -12,6 +12,7 @@ type numberLikesRepositoryInterface interface {
 	Store(entity *model.NumberLikes) error
 	CountLikes(postID string) (int, error)
 	Find(postID, userID string) (*model.NumberLikes, error)
+	Update(id string, value bool) error
 	Remove(id string) error
 }
 
@@ -21,11 +22,13 @@ func (r *numberLikesRepositoryImpl) scanIterator(rows *sql.Rows) (*model.NumberL
 	numberLikesID := sql.NullString{}
 	userID := sql.NullString{}
 	postID := sql.NullString{}
+	valueLike := sql.NullBool{}
 
 	err := rows.Scan(
 		&numberLikesID,
 		&userID,
 		&postID,
+		&valueLike,
 	)
 
 	if err != nil {
@@ -46,6 +49,10 @@ func (r *numberLikesRepositoryImpl) scanIterator(rows *sql.Rows) (*model.NumberL
 		numberLikesEntity.PostId = postID.String
 	}
 
+	if valueLike.Valid {
+		numberLikesEntity.ValueLike = valueLike.Bool
+	}
+
 	return numberLikesEntity, nil
 }
 
@@ -59,9 +66,9 @@ func (r *numberLikesRepositoryImpl) Store(entity *model.NumberLikes) error {
 	sqlText := `
 	
 		INSERT INTO tb_number_likes 
-		(id, post_pid, user_uid)
+		(id, post_pid, user_uid, value_like)
 		VALUES
-		($1, $2, $3)
+		($1, $2, $3, true)
 	
 	`
 
@@ -101,7 +108,7 @@ func (r *numberLikesRepositoryImpl) CountLikes(postID string) (int, error) {
 			COUNT(user_uid)
 		FROM tb_number_likes 
 		WHERE deleted_at is null and
-			post_pid = $1
+			post_pid = $1 and value_like = true
 	`
 
 	row := db.QueryRow(sqlText, postID)
@@ -153,6 +160,44 @@ func (r *numberLikesRepositoryImpl) Find(postID, userID string) (*model.NumberLi
 	}
 
 	return nil, errors.New("erro when finding")
+}
+
+func (r *numberLikesRepositoryImpl) Update(id string, value bool) error {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	sqlText := `
+		UPDATE tb_number_likes SET
+			value_like = $2
+			updated_at = now()
+		WHERE deleted_at is null and id = $1
+	`
+
+	stmt, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+
+	result, err := stmt.Exec(id, value)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected != 1 {
+		return errors.New("error when deleting")
+	}
+
+	return nil
 }
 
 func (r *numberLikesRepositoryImpl) Remove(id string) error {
