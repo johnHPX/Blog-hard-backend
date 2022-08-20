@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -135,8 +134,6 @@ func makeCommentListPostEndPoint() endpoint.Endpoint {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1004, err, req.MID)
 		}
 
-		fmt.Println(comments)
-
 		var entities []commentEntity
 		for _, v := range comments {
 			entities = append(entities, commentEntity{
@@ -166,6 +163,7 @@ func CommentListPostHandler() http.Handler {
 }
 
 type commentListUserRequest struct {
+	UserID  string
 	Offset  int
 	Limit   int
 	Page    int
@@ -180,7 +178,8 @@ type commentListUserResponse struct {
 }
 
 func decodeCommentListUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
-
+	vars := mux.Vars(r)
+	userID := vars["userID"]
 	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
 	if err != nil {
 		offset = 0
@@ -195,6 +194,7 @@ func decodeCommentListUserRequest(ctx context.Context, r *http.Request) (interfa
 	}
 	mid := r.URL.Query().Get("mid")
 	dto := &commentListUserRequest{
+		UserID:  userID,
 		Offset:  int(offset),
 		Limit:   int(limit),
 		Page:    int(page),
@@ -220,7 +220,7 @@ func makeCommentListUserEndPoint() endpoint.Endpoint {
 		}
 
 		service := service.NewCommentService(userToken.UserID, userToken.Kind)
-		comments, count, err := service.ListCommentsUser(req.Offset, req.Limit, req.Page)
+		comments, count, err := service.ListCommentsUser(req.UserID, req.Offset, req.Limit, req.Page)
 		if err != nil {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1007, err, req.MID)
 		}
@@ -255,6 +255,7 @@ func CommentListUserHandler() http.Handler {
 
 type commentListPostUserRequest struct {
 	PostID  string
+	UserID  string
 	Offset  int
 	Limit   int
 	Page    int
@@ -271,6 +272,7 @@ type commentListPostUserResponse struct {
 func decodecommentListPostUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
 	vars := mux.Vars(r)
 	postID := vars["postID"]
+	userID := vars["userID"]
 	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
 	if err != nil {
 		offset = 0
@@ -286,6 +288,7 @@ func decodecommentListPostUserRequest(ctx context.Context, r *http.Request) (int
 	mid := r.URL.Query().Get("mid")
 	dto := &commentListPostUserRequest{
 		PostID:  postID,
+		UserID:  userID,
 		Offset:  int(offset),
 		Limit:   int(limit),
 		Page:    int(page),
@@ -311,7 +314,7 @@ func makeCommentListPostUserEndPoint() endpoint.Endpoint {
 		}
 
 		service := service.NewCommentService(userToken.UserID, userToken.Kind)
-		comments, count, err := service.ListCommentsPostUser(req.PostID, req.Offset, req.Limit, req.Page)
+		comments, count, err := service.ListCommentsPostUser(req.PostID, req.UserID, req.Offset, req.Limit, req.Page)
 		if err != nil {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1010, err, req.MID)
 		}

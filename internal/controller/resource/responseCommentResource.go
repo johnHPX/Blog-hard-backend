@@ -130,13 +130,7 @@ func makeResponseCommentListEndPoint() endpoint.Endpoint {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1003, errors.New("invalid request"), "na")
 		}
 
-		tokenFunc := service.NewAccessService()
-		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
-		if err != nil {
-			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1001, err, req.MID)
-		}
-
-		service := service.NewResponseCommentService(userToken.UserID, userToken.Kind)
+		service := service.NewResponseCommentService("", "")
 		responseComments, count, err := service.List(req.CommentID, req.Offset, req.Limit, req.Page)
 		if err != nil {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1004, err, req.MID)
@@ -171,6 +165,7 @@ func ResponseCommentListHandler() http.Handler {
 }
 
 type responseCommentListUserRequest struct {
+	UserID  string
 	Offset  int
 	Limit   int
 	Page    int
@@ -185,6 +180,8 @@ type responseCommentListUserResponse struct {
 }
 
 func decoderesponseCommentListUserRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	userID := vars["userID"]
 	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
 	if err != nil {
 		offset = 0
@@ -199,6 +196,7 @@ func decoderesponseCommentListUserRequest(ctx context.Context, r *http.Request) 
 	}
 	mid := r.URL.Query().Get("mid")
 	dto := &responseCommentListUserRequest{
+		UserID:  userID,
 		Offset:  int(offset),
 		Limit:   int(limit),
 		Page:    int(page),
@@ -223,7 +221,7 @@ func makeResponseCommentListUserEndPoint() endpoint.Endpoint {
 		}
 
 		service := service.NewResponseCommentService(userToken.UserID, userToken.Kind)
-		responseComments, count, err := service.ListUser(req.Offset, req.Limit, req.Page)
+		responseComments, count, err := service.ListUser(req.UserID, req.Offset, req.Limit, req.Page)
 		if err != nil {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1004, err, req.MID)
 		}

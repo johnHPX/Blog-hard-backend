@@ -7,6 +7,7 @@ import (
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type postRepositoryInterface interface {
@@ -88,7 +89,7 @@ func (r *postRepositoryImpl) Store(post *model.Post) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("error when registering")
+		return errors.New(messages.StoreError)
 	}
 
 	return nil
@@ -183,7 +184,7 @@ func (r *postRepositoryImpl) Find(id string) (*model.Post, error) {
 		return post, nil
 	}
 
-	return nil, errors.New("error finding")
+	return nil, errors.New(messages.FindError)
 }
 
 func (r *postRepositoryImpl) ListTitle(title string, offset, limit, page int) ([]model.Post, error) {
@@ -346,7 +347,7 @@ func (r *postRepositoryImpl) Update(post *model.Post) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("err updating")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil
@@ -382,7 +383,7 @@ func (r *postRepositoryImpl) Remove(id string) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("err deleting")
+		return errors.New(messages.RemoveError)
 	}
 
 	return nil

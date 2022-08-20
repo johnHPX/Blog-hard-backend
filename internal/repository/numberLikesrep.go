@@ -6,6 +6,7 @@ import (
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type numberLikesRepositoryInterface interface {
@@ -90,7 +91,7 @@ func (r *numberLikesRepositoryImpl) Store(entity *model.NumberLikes) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("error when register")
+		return errors.New(messages.StoreError)
 	}
 
 	return nil
@@ -122,7 +123,7 @@ func (r *numberLikesRepositoryImpl) CountLikes(postID string) (int, error) {
 		return int(count.Int64), err
 	}
 
-	return 0, errors.New("erro when count")
+	return 0, errors.New(messages.CountError)
 
 }
 
@@ -159,7 +160,7 @@ func (r *numberLikesRepositoryImpl) Find(postID, userID string) (*model.NumberLi
 		return nl, nil
 	}
 
-	return nil, errors.New("erro when finding")
+	return nil, errors.New(messages.FindError)
 }
 
 func (r *numberLikesRepositoryImpl) Update(id string, value bool) error {
@@ -194,7 +195,7 @@ func (r *numberLikesRepositoryImpl) Update(id string, value bool) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("error when deleting")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil
@@ -231,7 +232,7 @@ func (r *numberLikesRepositoryImpl) Remove(id string) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("error when deleting")
+		return errors.New(messages.RemoveError)
 	}
 
 	return nil

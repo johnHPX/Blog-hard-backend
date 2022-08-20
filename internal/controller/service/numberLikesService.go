@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
@@ -29,7 +30,7 @@ func (s *numberLikesServiceImpl) LikePost(postID string) error {
 
 	_, err = repNumberLikes.Find(postID, s.userID)
 	if err == nil {
-		return errors.New("apenas uma curtida por publicação")
+		return errors.New(messages.LikePost)
 	}
 
 	nlid := uuid.New()
@@ -56,7 +57,7 @@ func (s *numberLikesServiceImpl) DislikePost(postID string) error {
 	repNumberLikes := repository.NewNumberLikerRepository()
 	entity, err := repNumberLikes.Find(PostIDVal.(string), s.userID)
 	if err != nil {
-		return err
+		return errors.New(messages.DeslikePost)
 	}
 
 	if entity.ValueLike {

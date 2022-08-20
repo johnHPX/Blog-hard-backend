@@ -21,13 +21,13 @@ var commentRoutes = []Router{
 	},
 	{
 		TokenIsReq: true,
-		Path:       "/comment/list/user",
+		Path:       "/comment/list/user/id/{userID}",
 		EndPointer: resource.CommentListUserHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},
 	{
 		TokenIsReq: true,
-		Path:       "/comment/list/post/id/{postID}/user",
+		Path:       "/comment/list/post/id/{postID}/user/id/{userID}",
 		EndPointer: resource.CommentListPostUserHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},

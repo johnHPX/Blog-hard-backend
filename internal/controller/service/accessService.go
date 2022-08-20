@@ -9,6 +9,7 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type userToken struct {
@@ -41,7 +42,7 @@ func (s *accessServiceImpl) GenerateNewToken(userID string) (string, error) {
 
 	// verific if rtoken was blocked
 	if access.IsBlocked {
-		return "", errors.New("token de reflash está bloqueado")
+		return "", errors.New(messages.TokenBlocked)
 	}
 
 	// validate rtoken
@@ -113,7 +114,7 @@ func (s *accessServiceImpl) ValidateAToken(r *http.Request) error {
 		return nil
 	}
 
-	return errors.New("token invalido")
+	return errors.New(messages.InvalideToken)
 }
 
 func (s *accessServiceImpl) ValidateRToken(rtoken string) error {
@@ -126,7 +127,7 @@ func (s *accessServiceImpl) ValidateRToken(rtoken string) error {
 		return nil
 	}
 
-	return errors.New("token invalido")
+	return errors.New(messages.InvalideToken)
 }
 
 func (s *accessServiceImpl) ExtractTokenInfo(r *http.Request) (*userToken, error) {
@@ -146,7 +147,7 @@ func (s *accessServiceImpl) ExtractTokenInfo(r *http.Request) (*userToken, error
 		}, nil
 	}
 
-	return nil, errors.New("token inválido")
+	return nil, errors.New(messages.InvalideToken)
 }
 
 func (s *accessServiceImpl) ExtractInvalideToken(r *http.Request) (string, error) {

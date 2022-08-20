@@ -6,12 +6,14 @@ import (
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
 type categoryServiceInterface interface {
 	CreateCategory(name string) error
 	ListCategory(offset, limit, page int) ([]model.Category, int, error)
+	ListCategoryByPost(postID string, offset, limit, page int) ([]model.Category, int, error)
 	FindCategory(categoryID string) (*model.Category, error)
 	UpdateCategory(categoryID, name string) error
 	RemoveCategory(categoryID string) error
@@ -25,7 +27,7 @@ type categoryServiceImpl struct {
 func (s *categoryServiceImpl) CreateCategory(name string) error {
 
 	if s.kind != "adm" {
-		return errors.New("Apenas usuarios admins podem usar essa funcionalidade")
+		return errors.New(messages.AdmMessage)
 	}
 
 	val := validator.NewValidator()
@@ -51,7 +53,7 @@ func (s *categoryServiceImpl) CreateCategory(name string) error {
 func (s *categoryServiceImpl) ListCategory(offset, limit, page int) ([]model.Category, int, error) {
 
 	if s.kind != "adm" {
-		return nil, 0, errors.New("Apenas usuarios admins podem usar essa funcionalidade")
+		return nil, 0, errors.New(messages.AdmMessage)
 	}
 
 	repCategory := repository.NewCategoryRepository()
@@ -67,10 +69,35 @@ func (s *categoryServiceImpl) ListCategory(offset, limit, page int) ([]model.Cat
 	return categoryEntities, count, nil
 }
 
+func (s *categoryServiceImpl) ListCategoryByPost(postID string, offset, limit, page int) ([]model.Category, int, error) {
+
+	if s.kind != "adm" {
+		return nil, 0, errors.New(messages.AdmMessage)
+	}
+
+	val := validator.NewValidator()
+	postIDval, err := val.CheckAnyData("id da postagem", 36, postID, true)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	repCategory := repository.NewCategoryRepository()
+	categoryEntities, err := repCategory.ListPost(postIDval.(string), offset, limit, page)
+	if err != nil {
+		return nil, 0, err
+	}
+	count, err := repCategory.CountPost(postIDval.(string))
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return categoryEntities, count, nil
+}
+
 func (s *categoryServiceImpl) FindCategory(categoryID string) (*model.Category, error) {
 
 	if s.kind != "adm" {
-		return nil, errors.New("Apenas usuarios admins podem usar essa funcionalidade")
+		return nil, errors.New(messages.AdmMessage)
 	}
 
 	val := validator.NewValidator()
@@ -91,7 +118,7 @@ func (s *categoryServiceImpl) FindCategory(categoryID string) (*model.Category, 
 func (s *categoryServiceImpl) UpdateCategory(categoryID, name string) error {
 
 	if s.kind != "adm" {
-		return errors.New("Apenas usuarios admins podem usar essa funcionalidade")
+		return errors.New(messages.AdmMessage)
 	}
 
 	val := validator.NewValidator()
@@ -120,7 +147,7 @@ func (s *categoryServiceImpl) UpdateCategory(categoryID, name string) error {
 func (s *categoryServiceImpl) RemoveCategory(categoryID string) error {
 
 	if s.kind != "adm" {
-		return errors.New("Apenas usuarios admins podem usar essa funcionalidade")
+		return errors.New(messages.AdmMessage)
 	}
 
 	val := validator.NewValidator()

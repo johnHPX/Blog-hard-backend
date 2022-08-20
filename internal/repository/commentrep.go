@@ -7,6 +7,7 @@ import (
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type commentRepositoryInterface interface {
@@ -99,7 +100,7 @@ func (r *commentRepositoryImpl) Store(entity *model.Comment) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("error when registering")
+		return errors.New(messages.StoreError)
 	}
 
 	return nil
@@ -320,7 +321,7 @@ func (r *commentRepositoryImpl) Find(commentID string) (*model.Comment, error) {
 		return comment, nil
 	}
 
-	return nil, errors.New("error finding")
+	return nil, errors.New(messages.FindError)
 }
 
 func (r *commentRepositoryImpl) Update(entity *model.Comment) error {
@@ -355,7 +356,7 @@ func (r *commentRepositoryImpl) Update(entity *model.Comment) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("err updating")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil
@@ -391,7 +392,7 @@ func (r *commentRepositoryImpl) Remove(commentID string) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("errpr deleting")
+		return errors.New(messages.RemoveError)
 	}
 
 	return nil

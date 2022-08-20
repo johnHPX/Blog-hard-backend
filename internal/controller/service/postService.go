@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
@@ -29,7 +30,7 @@ type postServiceImpl struct {
 func (s *postServiceImpl) Store(title, content string) error {
 
 	if s.Kind != "adm" {
-		return errors.New("apenas usuario admin pode utilizar essa função")
+		return errors.New(messages.AdmMessage)
 	}
 
 	// validator
@@ -106,7 +107,7 @@ func (s *postServiceImpl) Count() (int, error) {
 
 func (s *postServiceImpl) Find(id string) (*model.Post, error) {
 	if s.Kind != "adm" {
-		return nil, errors.New("apenas usuario admin pode utilizar essa função")
+		return nil, errors.New(messages.AdmMessage)
 	}
 
 	val := validator.NewValidator()
@@ -183,7 +184,7 @@ func (s *postServiceImpl) CountTitle(title string) (int, error) {
 
 func (s *postServiceImpl) ListByCategory(categoryName string, offset, limit, page int) ([]model.Post, int, error) {
 	val := validator.NewValidator()
-	categoryVal, err := val.CheckAnyData("titulo", 255, categoryName, true)
+	categoryVal, err := val.CheckAnyData("categoria", 255, categoryName, true)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -220,7 +221,7 @@ func (s *postServiceImpl) ListByCategory(categoryName string, offset, limit, pag
 
 func (s *postServiceImpl) Update(id, title, content string) error {
 	if s.Kind != "adm" {
-		return errors.New("apenas usuario admin pode utilizar essa função")
+		return errors.New(messages.AdmMessage)
 	}
 
 	val := validator.NewValidator()
@@ -253,7 +254,7 @@ func (s *postServiceImpl) Update(id, title, content string) error {
 
 func (s *postServiceImpl) Remove(id string) error {
 	if s.Kind != "adm" {
-		return errors.New("apenas usuario admin pode utilizar essa função")
+		return errors.New(messages.AdmMessage)
 	}
 	val := validator.NewValidator()
 	IdVal, err := val.CheckAnyData("id", 36, id, true)

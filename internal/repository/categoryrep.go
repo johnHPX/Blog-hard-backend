@@ -7,12 +7,15 @@ import (
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type categoryRepositoryInterface interface {
 	Store(entity *model.Category) error
 	List(offset, limit, page int) ([]model.Category, error)
 	Count() (int, error)
+	ListPost(postID string, offset, limit, page int) ([]model.Category, error)
+	CountPost(postID string) (int, error)
 	Find(categoryID string) (*model.Category, error)
 	Update(entity *model.Category) error
 	Remove(categoryID string) error
@@ -77,7 +80,7 @@ func (r *categoryRepositoryImpl) Store(entity *model.Category) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("error when registering")
+		return errors.New(messages.StoreError)
 	}
 
 	return nil
@@ -141,6 +144,70 @@ func (r *categoryRepositoryImpl) Count() (int, error) {
 	return count, nil
 }
 
+func (r *categoryRepositoryImpl) ListPost(postID string, offset, limit, page int) ([]model.Category, error) {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	sqlText := fmt.Sprintf(`
+	SELECT 
+		c.id,
+		c.name
+	FROM tb_category c
+	INNER JOIN tb_post_category pc ON pc.category_cid = c.id
+	INNER JOIN tb_post p ON p.id = pc.post_pid
+	WHERE p.deleted_at is null and pc.deleted_at is null and c.deleted_at is null
+	 and p.id = $1
+	LIMIT %v OFFSET ((%v - 1) * %v) + %v
+`, limit, page, limit, offset)
+
+	rows, err := db.Query(sqlText, postID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	categorys := make([]model.Category, 0)
+	for rows.Next() {
+		category, err := r.scanIterator(rows)
+		if err != nil {
+			return nil, err
+		}
+		categorys = append(categorys, *category)
+	}
+
+	return categorys, nil
+}
+
+func (r *categoryRepositoryImpl) CountPost(postID string) (int, error) {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return 0, err
+	}
+	defer db.Close()
+
+	sqlText := `
+		SELECT 
+			COUNT(*)
+		FROM tb_category c
+		INNER JOIN tb_post_category pc ON pc.category_cid = c.id
+		INNER JOIN tb_post p ON p.id = pc.post_pid
+		WHERE p.deleted_at is null and pc.deleted_at is null and c.deleted_at is null
+		and p.id = $1
+	`
+
+	var count int
+	row := db.QueryRow(sqlText, postID)
+	err = row.Scan(&count)
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
+
 func (r *categoryRepositoryImpl) Find(categoryID string) (*model.Category, error) {
 	db, err := databaseConn.Connect()
 	if err != nil {
@@ -170,7 +237,7 @@ func (r *categoryRepositoryImpl) Find(categoryID string) (*model.Category, error
 		return category, nil
 	}
 
-	return nil, errors.New("error finding")
+	return nil, errors.New(messages.FindError)
 }
 
 func (r *categoryRepositoryImpl) Update(entity *model.Category) error {
@@ -204,7 +271,7 @@ func (r *categoryRepositoryImpl) Update(entity *model.Category) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("err updating")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil
@@ -240,7 +307,7 @@ func (r *categoryRepositoryImpl) Remove(categoryID string) error {
 	}
 
 	if rowsAffected != 1 {
-		return errors.New("errpr deleting")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil

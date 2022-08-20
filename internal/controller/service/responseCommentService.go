@@ -1,16 +1,19 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
 type responseCommentServiceInterface interface {
 	Store(commentID, title, content string) error
 	List(commentID string, offset, limit, page int) ([]model.ResponseComment, int, error)
-	ListUser(offset, limit, page int) ([]model.ResponseComment, int, error)
+	ListUser(userID string, offset, limit, page int) ([]model.ResponseComment, int, error)
 	Update(responseCommentID, title, content string) error
 	Remove(responseCommentID string) error
 }
@@ -72,7 +75,12 @@ func (s *responseCommentServiceImpl) List(commentID string, offset, limit, page 
 	return responseCommentsEntities, count, nil
 }
 
-func (s *responseCommentServiceImpl) ListUser(offset, limit, page int) ([]model.ResponseComment, int, error) {
+func (s *responseCommentServiceImpl) ListUser(userID string, offset, limit, page int) ([]model.ResponseComment, int, error) {
+
+	if s.userID != userID && s.kind != "adm" {
+		return nil, 0, errors.New(messages.AnotherUser)
+	}
+
 	repResponseComment := repository.NewResponseCommmentRepository()
 	commentsEntities, err := repResponseComment.ListUser(s.userID, offset, limit, page)
 	if err != nil {

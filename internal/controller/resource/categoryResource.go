@@ -158,6 +158,93 @@ func CategoryListHandler() http.Handler {
 	)
 }
 
+type categoryListPostRequest struct {
+	PostID  string
+	Offset  int
+	Limit   int
+	Page    int
+	MID     string
+	Request *http.Request
+}
+
+type categoryListPostResponse struct {
+	Count     int              `json:"count"`
+	Categorys []categoryEntity `json:"categorys"`
+	MID       string           `json:"mid"`
+}
+
+func decodeCategoryListPostRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	vars := mux.Vars(r)
+	postID := vars["postID"]
+	offset, err := strconv.ParseInt(r.URL.Query().Get("offset"), 10, 64)
+	if err != nil {
+		offset = 0
+	}
+	limit, err := strconv.ParseInt(r.URL.Query().Get("limit"), 10, 64)
+	if err != nil {
+		limit = 10
+	}
+	page, err := strconv.ParseInt(r.URL.Query().Get("page"), 10, 64)
+	if err != nil {
+		page = 1
+	}
+	mid := r.URL.Query().Get("mid")
+	dto := &categoryListPostRequest{
+		PostID:  postID,
+		Offset:  int(offset),
+		Limit:   int(limit),
+		Page:    int(page),
+		MID:     mid,
+		Request: r,
+	}
+	return dto, nil
+}
+
+func makeCategoryListPostEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*categoryListPostRequest)
+		if !ok {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1003, errors.New("invalid request"), "na")
+		}
+
+		tokenFunc := service.NewAccessService()
+		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1004, err, req.MID)
+		}
+
+		service := service.NewCategoryService(userToken.UserID, userToken.Kind)
+		category, count, err := service.ListCategoryByPost(req.PostID, req.Offset, req.Limit, req.Page)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1005, err, req.MID)
+		}
+
+		var entities []categoryEntity
+		for _, v := range category {
+			entities = append(entities, categoryEntity{
+				CategoryID: v.CategoryID,
+				Name:       v.Name,
+			})
+		}
+
+		return &categoryListResponse{
+			Count:     count,
+			Categorys: entities,
+			MID:       req.MID,
+		}, nil
+	}
+}
+
+func CategoryListPostHandler() http.Handler {
+	return httptransport.NewServer(
+		makeCategoryListPostEndPoint(),
+		decodeCategoryListPostRequest,
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
+	)
+}
+
 type categoryFindRequest struct {
 	categoryID string
 	MID        string

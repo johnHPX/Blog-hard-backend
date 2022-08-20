@@ -14,14 +14,14 @@ var responseComment = []Router{
 		Method:     http.MethodPost,
 	},
 	{
-		TokenIsReq: true,
+		TokenIsReq: false,
 		Path:       "/response/comment/list/comment/id/{commentID}",
 		EndPointer: resource.ResponseCommentListHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},
 	{
 		TokenIsReq: true,
-		Path:       "/response/comment/list/user",
+		Path:       "/response/comment/list/user/id/{userID}",
 		EndPointer: resource.ResponseCommentListUserHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},

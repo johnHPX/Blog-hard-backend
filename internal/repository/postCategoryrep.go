@@ -5,6 +5,7 @@ import (
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type postCategoryRepositoryInterface interface {
@@ -41,7 +42,7 @@ func (r *postCategoryRepositoryImpl) Store(entity *model.PostCategory) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when registering")
+		return errors.New(messages.StoreError)
 	}
 
 	return nil
@@ -77,7 +78,7 @@ func (r *postCategoryRepositoryImpl) Update(entity *model.PostCategory) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when updating")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil
@@ -109,7 +110,7 @@ func (r *postCategoryRepositoryImpl) Remove(postID, categoryID string) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when deleting")
+		return errors.New(messages.RemoveError)
 	}
 
 	return nil

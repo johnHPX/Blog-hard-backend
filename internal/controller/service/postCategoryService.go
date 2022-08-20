@@ -1,9 +1,12 @@
 package service
 
 import (
+	"errors"
+
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
@@ -18,6 +21,11 @@ type postCategoryServiceImpl struct {
 }
 
 func (s *postCategoryServiceImpl) StorePostCategory(postID, categoryID string) error {
+
+	if s.kind != "adm" {
+		return errors.New(messages.AdmMessage)
+	}
+
 	val := validator.NewValidator()
 	postIDval, err := val.CheckAnyData("id da postagem", 36, postID, true)
 	if err != nil {
@@ -46,6 +54,11 @@ func (s *postCategoryServiceImpl) StorePostCategory(postID, categoryID string) e
 }
 
 func (s *postCategoryServiceImpl) RemovePostCategory(postID, categoryID string) error {
+
+	if s.kind != "adm" {
+		return errors.New(messages.AdmMessage)
+	}
+
 	val := validator.NewValidator()
 	postIDval, err := val.CheckAnyData("id da postagem", 36, postID, true)
 	if err != nil {

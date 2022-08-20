@@ -21,6 +21,12 @@ var categoryRoutes = []Router{
 	},
 	{
 		TokenIsReq: true,
+		Path:       "/category/list/post/id/{postID}",
+		EndPointer: resource.CategoryListPostHandler().ServeHTTP,
+		Method:     http.MethodGet,
+	},
+	{
+		TokenIsReq: true,
 		Path:       "/category/find/id/{id}",
 		EndPointer: resource.CategoryFindHandler().ServeHTTP,
 		Method:     http.MethodGet,

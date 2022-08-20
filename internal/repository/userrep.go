@@ -7,6 +7,7 @@ import (
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type userRepositoryInterface interface {
@@ -123,7 +124,7 @@ func (r *userRepositoryImpl) CheckEmail(email string) error {
 	defer row.Close()
 
 	if row.Next() {
-		return errors.New("this email is already registered")
+		return errors.New(messages.EmailIsRegister)
 	}
 
 	return nil
@@ -150,7 +151,7 @@ func (r *userRepositoryImpl) CheckNick(nick string) error {
 	defer row.Close()
 
 	if row.Next() {
-		return errors.New("this nick is already registered")
+		return errors.New(messages.NickIsRegister)
 	}
 
 	return nil
@@ -182,7 +183,7 @@ func (r *userRepositoryImpl) Store(entity *model.User) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when registering")
+		return errors.New(messages.StoreError)
 	}
 
 	return nil
@@ -361,7 +362,7 @@ func (r *userRepositoryImpl) Find(id string) (*model.User, error) {
 		return user, nil
 	}
 
-	return nil, errors.New("error finding")
+	return nil, errors.New(messages.FindError)
 }
 
 func (r *userRepositoryImpl) Update(user *model.User) error {
@@ -395,7 +396,7 @@ func (r *userRepositoryImpl) Update(user *model.User) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when updating")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil
@@ -427,7 +428,7 @@ func (r *userRepositoryImpl) Remove(id string) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when deleting")
+		return errors.New(messages.RemoveError)
 	}
 
 	return nil
@@ -470,7 +471,7 @@ func (r *userRepositoryImpl) FindByEmailOrNick(emailOrNick string) (*model.User,
 		return user, nil
 	}
 
-	return nil, errors.New("This user does not exist")
+	return nil, errors.New(messages.UserNotExists)
 }
 
 func NewUserRepository() userRepositoryInterface {

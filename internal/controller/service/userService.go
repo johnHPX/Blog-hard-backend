@@ -7,6 +7,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/repository"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
@@ -97,7 +98,7 @@ func (s *userServiceImpl) Store(name, telephone, nick, email, secret string) err
 func (s *userServiceImpl) StoreADM(name, telephone, nick, email, secret, kind string) error {
 
 	if s.Kind != "adm" {
-		return errors.New("Essa funcionalidade só é permitida para o admin do site")
+		return errors.New(messages.AdmMessage)
 	}
 
 	val := validator.NewValidator()
@@ -171,7 +172,7 @@ func (s *userServiceImpl) StoreADM(name, telephone, nick, email, secret, kind st
 func (s *userServiceImpl) List(offset, limit, page int) ([]model.User, error) {
 
 	if s.Kind != "adm" {
-		return nil, errors.New("Seu Usuário Não é o Admin")
+		return nil, errors.New(messages.AdmMessage)
 	}
 
 	repUser := repository.NewUserRepository()
@@ -186,7 +187,7 @@ func (s *userServiceImpl) List(offset, limit, page int) ([]model.User, error) {
 func (s *userServiceImpl) Count() (int, error) {
 
 	if s.Kind != "adm" {
-		return 0, errors.New("Seu Usuário Não é o Admin")
+		return 0, errors.New(messages.AdmMessage)
 	}
 
 	repUser := repository.NewUserRepository()
@@ -200,7 +201,7 @@ func (s *userServiceImpl) Count() (int, error) {
 func (s *userServiceImpl) ListName(name string, offset, limit, page int) ([]model.User, error) {
 
 	if s.Kind != "adm" {
-		return nil, errors.New("Seu Usuário Não é o Admin")
+		return nil, errors.New(messages.AdmMessage)
 	}
 
 	repUser := repository.NewUserRepository()
@@ -215,7 +216,7 @@ func (s *userServiceImpl) ListName(name string, offset, limit, page int) ([]mode
 func (s *userServiceImpl) CountName(name string) (int, error) {
 
 	if s.Kind != "adm" {
-		return 0, errors.New("Seu Usuário Não é o Admin")
+		return 0, errors.New(messages.AdmMessage)
 	}
 
 	repUser := repository.NewUserRepository()
@@ -228,8 +229,8 @@ func (s *userServiceImpl) CountName(name string) (int, error) {
 
 func (s *userServiceImpl) Find(id string) (*model.User, error) {
 
-	if s.UserID != id {
-		return nil, errors.New("Não pode buscar dados de outro usuario")
+	if s.UserID != id && s.Kind != "adm" {
+		return nil, errors.New(messages.AnotherUser)
 	}
 
 	repUser := repository.NewUserRepository()
@@ -243,8 +244,8 @@ func (s *userServiceImpl) Find(id string) (*model.User, error) {
 
 func (s *userServiceImpl) Update(id, name, telefone, nick, email, kind string) error {
 
-	if s.UserID != id {
-		return errors.New("Não pode atualizar Dados De outro usuario")
+	if s.UserID != id && s.Kind != "adm" {
+		return errors.New(messages.AnotherUser)
 	}
 
 	val := validator.NewValidator()
@@ -309,8 +310,8 @@ func (s *userServiceImpl) Update(id, name, telefone, nick, email, kind string) e
 
 func (s *userServiceImpl) Remove(id string) error {
 
-	if s.UserID != id {
-		return errors.New("Não pode deletar Dados De outro usuario")
+	if s.UserID != id && s.Kind != "adm" {
+		return errors.New(messages.AnotherUser)
 	}
 
 	// repositorys
@@ -381,7 +382,7 @@ func (s *userServiceImpl) Login(emailOrNick, secret string) (string, error) {
 
 		// verific if was blocked
 		if accessEntity.IsBlocked {
-			return "", errors.New("Seu usuario foi bloqueado! Não será possivel realizar sua autenticação no site")
+			return "", errors.New(messages.UserBlocked)
 		}
 
 		// remove a old rtoken

@@ -7,6 +7,7 @@ import (
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type accessRepositoryInterface interface {
@@ -88,7 +89,7 @@ func (r *accessRepositoryImpl) Store(token, userID string, expired time.Time) er
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when registering")
+		return errors.New(messages.StoreError)
 	}
 
 	return nil
@@ -123,7 +124,7 @@ func (r *accessRepositoryImpl) BlockAcess(userID string, block bool) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when block")
+		return errors.New(messages.BlockError)
 	}
 
 	return nil
@@ -160,7 +161,7 @@ func (r *accessRepositoryImpl) FindToken(userID string) (*model.Access, error) {
 		return access, nil
 	}
 
-	return nil, errors.New("error finding")
+	return nil, errors.New(messages.FindError)
 
 }
 
@@ -194,7 +195,7 @@ func (r *accessRepositoryImpl) UpdateToken(rtoken, userID string) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when updating")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil
@@ -230,7 +231,7 @@ func (r *accessRepositoryImpl) RemoveToken(userID string) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when deleting")
+		return errors.New(messages.RemoveError)
 	}
 
 	return nil

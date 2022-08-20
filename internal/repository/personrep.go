@@ -5,6 +5,7 @@ import (
 
 	"github.com/johnHPX/blog-hard-backend/internal/model"
 	"github.com/johnHPX/blog-hard-backend/internal/utils/databaseConn"
+	"github.com/johnHPX/blog-hard-backend/internal/utils/messages"
 )
 
 type personRepositoryInterface interface {
@@ -41,7 +42,7 @@ func (r *personRepositoryImpl) Store(entity *model.Person, userID string) error 
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when registering")
+		return errors.New(messages.StoreError)
 	}
 
 	return nil
@@ -77,7 +78,7 @@ func (r *personRepositoryImpl) Update(entity *model.Person) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when updating")
+		return errors.New(messages.UpdateError)
 	}
 
 	return nil
@@ -109,7 +110,7 @@ func (r *personRepositoryImpl) Remove(id string) error {
 		return err
 	}
 	if rowAffected != 1 {
-		return errors.New("error when deleting")
+		return errors.New(messages.RemoveError)
 	}
 
 	return nil
