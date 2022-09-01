@@ -17,6 +17,6 @@ var numberLikes = []Router{
 		TokenIsReq: true,
 		Path:       "/user/post/dislike",
 		EndPointer: resource.NumberLikesRemoveHandle().ServeHTTP,
-		Method:     http.MethodPost,
+		Method:     http.MethodDelete,
 	},
 }

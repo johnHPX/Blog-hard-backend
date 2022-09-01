@@ -7,3 +7,6 @@ database:
   pswd: "1234567890"
   dbnm: "db-blogHard"
   port: "5432"
+contact:
+  email: "jonatasfreitas008@gmail.com"
+  secret: "elnbeylstdsmcomc"

@@ -574,3 +574,216 @@ func UserLoginHandler() http.Handler {
 		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }
+
+type userSendEmailRequest struct {
+	Email string `json:"email"`
+	MID   string `json:"mid"`
+}
+
+type userSendEmailResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodeSendEmailRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	dto := new(userSendEmailRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	return dto, nil
+}
+
+func makeSendEmailEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userSendEmailRequest)
+		if !ok {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1025, errors.New("invalid request"), "na")
+		}
+
+		service := service.NewUserService("", "")
+		err := service.SendCodeGeneratedToEmail(req.Email)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1026, err, req.MID)
+		}
+
+		return &userSendEmailResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UserSendEmailHandler() http.Handler {
+	return httptransport.NewServer(
+		makeSendEmailEndPoint(),
+		decodeSendEmailRequest,
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
+	)
+}
+
+type userVerificCodeRequest struct {
+	Code string `json:"code"`
+	MID  string `json:"mid"`
+}
+
+type userVerificCodeResponse struct {
+	Token string `json:"token"`
+	MID   string `json:"mid"`
+}
+
+func decodeVerificCodeRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	dto := new(userVerificCodeRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	return dto, nil
+}
+
+func makeVerificCodeEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userVerificCodeRequest)
+		if !ok {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1027, errors.New("invalid request"), "na")
+		}
+
+		service := service.NewUserService("", "")
+		token, err := service.VerificCode(req.Code)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1028, err, req.MID)
+		}
+
+		return &userVerificCodeResponse{
+			Token: token,
+			MID:   req.MID,
+		}, nil
+	}
+}
+
+func UserVerificCodeHandler() http.Handler {
+	return httptransport.NewServer(
+		makeVerificCodeEndPoint(),
+		decodeVerificCodeRequest,
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
+	)
+}
+
+type userPasswordRecoveryRequest struct {
+	NewPassword string `json:"newPassword"`
+	MID         string `json:"mid"`
+	Request     *http.Request
+}
+
+type userPasswordRecoveryResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodePasswordRecoveryRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	dto := new(userPasswordRecoveryRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	dto.Request = r
+	return dto, nil
+}
+
+func makePasswordRecoveryEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userPasswordRecoveryRequest)
+		if !ok {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1029, errors.New("invalid request"), "na")
+		}
+
+		// gets token's informations
+		tokenFunc := service.NewAccessService()
+		useID, err := tokenFunc.ValidateAndExtractTokenRecovery(req.Request)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1030, err, req.MID)
+		}
+
+		service := service.NewUserService(useID, "")
+		err = service.SecretRecovery(req.NewPassword)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1031, err, req.MID)
+		}
+
+		return &userPasswordRecoveryResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UserPasswordRecoveryHandler() http.Handler {
+	return httptransport.NewServer(
+		makePasswordRecoveryEndPoint(),
+		decodePasswordRecoveryRequest,
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
+	)
+}
+
+type userPasswordUpdateRequest struct {
+	OldPassword string `json:"oldPassword"`
+	NewPassword string `json:"newPassword"`
+	MID         string `json:"mid"`
+	Request     *http.Request
+}
+
+type userPasswordUpdateResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodePasswordUpdateRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	dto := new(userPasswordUpdateRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	dto.Request = r
+	return dto, nil
+}
+
+func makePasswordUpdateEndPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userPasswordUpdateRequest)
+		if !ok {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1032, errors.New("invalid request"), "na")
+		}
+
+		// gets token's informations
+		tokenFunc := service.NewAccessService()
+		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1033, err, req.MID)
+		}
+
+		service := service.NewUserService(userToken.UserID, userToken.Kind)
+		err = service.SecretUpdate(req.OldPassword, req.NewPassword)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1034, err, req.MID)
+		}
+
+		return &userPasswordUpdateResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UserPasswordUpdateHandler() http.Handler {
+	return httptransport.NewServer(
+		makePasswordUpdateEndPoint(),
+		decodePasswordUpdateRequest,
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
+	)
+}

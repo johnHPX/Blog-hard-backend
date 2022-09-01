@@ -25,6 +25,8 @@ type accessServiceInterface interface {
 	ExtractTokenInfo(r *http.Request) (*userToken, error)
 	ExtractInvalideToken(r *http.Request) (string, error)
 	GenerateNewToken(userID string) (string, error)
+	GenerateTokenRecovery(userID string) (string, error)
+	ValidateAndExtractTokenRecovery(r *http.Request) (string, error)
 }
 
 type accessServiceImpl struct {
@@ -103,6 +105,16 @@ func (s *accessServiceImpl) CreateRToken() (string, error) {
 	return token.SignedString([]byte(s.SecretKey))
 }
 
+func (s *accessServiceImpl) GenerateTokenRecovery(userID string) (string, error) {
+	permissions := jwt.MapClaims{}
+	permissions["authorized"] = true
+	permissions["exp"] = time.Now().Add(time.Minute * 10).Unix()
+	permissions["userID-recovery"] = userID
+	permissions["recovery"] = true
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, permissions)
+	return token.SignedString([]byte(s.SecretKey))
+}
+
 func (s *accessServiceImpl) ValidateAToken(r *http.Request) error {
 	tokenString := s.getToken(r)
 	token, err := jwt.Parse(tokenString, s.returnCheckKey)
@@ -128,6 +140,27 @@ func (s *accessServiceImpl) ValidateRToken(rtoken string) error {
 	}
 
 	return errors.New(messages.InvalideToken)
+}
+
+func (s *accessServiceImpl) ValidateAndExtractTokenRecovery(r *http.Request) (string, error) {
+	tokenString := s.getToken(r)
+	token, err := jwt.Parse(tokenString, s.returnCheckKey)
+	if err != nil {
+		return "", err
+	}
+
+	if permissions, ok := token.Claims.(jwt.MapClaims); ok && token.Valid {
+		userID := permissions["userID-recovery"]
+		recovery := permissions["recovery"]
+
+		if !recovery.(bool) {
+			return "", errors.New(messages.InvalideToken)
+		}
+
+		return userID.(string), nil
+	}
+
+	return "", errors.New(messages.InvalideToken)
 }
 
 func (s *accessServiceImpl) ExtractTokenInfo(r *http.Request) (*userToken, error) {

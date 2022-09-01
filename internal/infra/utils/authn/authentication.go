@@ -28,9 +28,12 @@ func HeaderMethods(next http.HandlerFunc, method string) http.HandlerFunc {
 
 func Authenticate(nextFunction http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		tokenFunc := service.NewAccessService()
 		err := tokenFunc.ValidateAToken(r)
-		if err.Error() == "Token is expired" {
+
+		if err != nil && err.Error() == "Token is expired" {
+
 			userID, err := tokenFunc.ExtractInvalideToken(r)
 			if err != nil {
 				w.WriteHeader(http.StatusUnauthorized)
@@ -46,11 +49,8 @@ func Authenticate(nextFunction http.HandlerFunc) http.HandlerFunc {
 				return
 			}
 			r.Header.Set("Authorization", atoken)
-		} else {
-			response := responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 03, err, "ti")
-			responseAPI.EncodeResponse(nil, w, response)
-			return
 		}
+
 		nextFunction(w, r)
 	}
 }

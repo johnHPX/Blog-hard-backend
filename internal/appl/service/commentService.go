@@ -56,6 +56,12 @@ func (s *commentServiceImpl) CreateComment(postID, title, content string) error 
 		return err
 	}
 
+	systemService := NewSystemService()
+	err = systemService.SendEmailComment(commentID.String(), true)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

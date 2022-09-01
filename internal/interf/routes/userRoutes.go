@@ -55,4 +55,28 @@ var userRoutes = []Router{
 		EndPointer: resource.UserLoginHandler().ServeHTTP,
 		Method:     http.MethodPost,
 	},
+	{
+		TokenIsReq: false,
+		Path:       "/user/recor/email",
+		EndPointer: resource.UserSendEmailHandler().ServeHTTP,
+		Method:     http.MethodPost,
+	},
+	{
+		TokenIsReq: false,
+		Path:       "/user/verific/code",
+		EndPointer: resource.UserVerificCodeHandler().ServeHTTP,
+		Method:     http.MethodPost,
+	},
+	{
+		TokenIsReq: true,
+		Path:       "/user/password/recovery",
+		EndPointer: resource.UserPasswordRecoveryHandler().ServeHTTP,
+		Method:     http.MethodPut,
+	},
+	{
+		TokenIsReq: true,
+		Path:       "/user/password/update",
+		EndPointer: resource.UserPasswordUpdateHandler().ServeHTTP,
+		Method:     http.MethodPut,
+	},
 }

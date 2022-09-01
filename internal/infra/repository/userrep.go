@@ -22,6 +22,9 @@ type userRepositoryInterface interface {
 	CheckEmail(email string) error
 	CheckNick(nick string) error
 	FindByEmailOrNick(emailOrNick string) (*models.User, error)
+	UpdatePassword(newPassword, userID string) error
+	FindPassword(userID string) (string, error)
+	ListUserAdm(kind string, offset, limit, page int) ([]models.User, error)
 }
 
 type userRepositoryImpl struct{}
@@ -472,6 +475,113 @@ func (r *userRepositoryImpl) FindByEmailOrNick(emailOrNick string) (*models.User
 	}
 
 	return nil, errors.New(messages.UserNotExists)
+}
+
+func (r *userRepositoryImpl) UpdatePassword(newPassword, userID string) error {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	sqlText := `
+	
+		UPDATE tb_user SET
+			secret = $2,
+			updated_at = now()
+		WHERE deleted_at is null and id = $1
+	
+	`
+
+	stmt, err := db.Prepare(sqlText)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	result, err := stmt.Exec(userID, newPassword)
+	if err != nil {
+		return err
+	}
+
+	rowAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowAffected != 1 {
+		return errors.New(messages.UpdateError)
+	}
+
+	return nil
+
+}
+
+func (r *userRepositoryImpl) FindPassword(userID string) (string, error) {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return "", err
+	}
+	defer db.Close()
+
+	sqlText := `
+		SELECT secret FROM tb_user WHERE deleted_at is null and id = $1;
+	`
+
+	row, err := db.Query(sqlText, userID)
+	if err != nil {
+		return "", err
+	}
+	defer row.Close()
+
+	var secret string
+	if row.Next() {
+		err := row.Scan(&secret)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return secret, nil
+}
+
+func (r *userRepositoryImpl) ListUserAdm(kind string, offset, limit, page int) ([]models.User, error) {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	sqlText := fmt.Sprintf(`
+			select
+				u.id,
+				p.id,
+				p.name,
+				p.telephone,
+				u.nick,
+				u.email,
+				u.kind
+			from tb_person p
+			INNER JOIN tb_user u ON u.id = p.user_uid
+			where p.deleted_at is null and u.deleted_at is null and u.kind = $1
+			LIMIT %v OFFSET ((%v - 1) * (%v)) + %v`, limit, page, limit, offset)
+
+	rows, err := db.Query(sqlText, kind)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	entities := make([]models.User, 0)
+	for rows.Next() {
+		e, err := r.scanIterator(rows, false)
+		if err != nil {
+			return nil, err
+		}
+		entities = append(entities, *e)
+	}
+
+	return entities, nil
 }
 
 func NewUserRepository() userRepositoryInterface {

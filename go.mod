@@ -15,6 +15,8 @@ require (
 	github.com/go-kit/log v0.2.0 // indirect
 	github.com/go-logfmt/logfmt v0.5.1 // indirect
 	github.com/paemuri/brdoc v1.1.2 // indirect
+	github.com/toorop/go-dkim v0.0.0-20201103131630-e1cd1a0a5208 // indirect
+	github.com/xhit/go-simple-mail/v2 v2.11.0 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 )
 
@@ -26,6 +28,7 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/hashicorp/errwrap v1.1.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
+	github.com/xhit/go-simple-mail v2.2.2+incompatible
 	go.uber.org/atomic v1.9.0 // indirect
 	gopkg.in/yaml.v2 v2.4.0
 )

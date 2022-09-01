@@ -1,17 +1,16 @@
 # imagem oficial da golang
 FROM golang:1.18.3 as builder
 
-# It is important that these ARG's are defined after the FROM statement
+# É importante que esses ARGs sejam definidos após a instrução FROM
 ARG ACCESS_TOKEN_USR="johnHPX"
 ARG ACCESS_TOKEN_PWD="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"
-# git is required to fetch go dependencies
-# RUN apk add --no-cache ca-certificates git
-# Create the user and group files that will be used in the running 
-# container to run the process as an unprivileged user.
+
+# Cria os arquivos de usuário e grupo que serão usados ​​na execução
+# container para executar o processo como usuário sem privilégios.
 RUN mkdir /user && \
     echo 'nobody:x:65534:65534:nobody:/:' > /user/passwd && \
     echo 'nobody:x:65534:' > /user/group
-# Create a netrc file using the credentials specified using --build-arg
+# Crie um arquivo netrc usando as credenciais especificadas usando --build-arg
 RUN printf "machine github.com\n\
     login ${ACCESS_TOKEN_USR}\n\
     password ${ACCESS_TOKEN_PWD}\n\
@@ -34,7 +33,7 @@ RUN go mod verify
 # gerando um binario da aplicação
 RUN go build -o /server cmd/webapi/main.go
 
-# imagem scratch, para redução do dockerfile
+# imagem distroless, para redução do dockerfile
 FROM gcr.io/distroless/base-debian10
 
 # configurando o diretorio

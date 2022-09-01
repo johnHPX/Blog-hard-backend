@@ -16,6 +16,7 @@ type responseCommentRepositoryInterface interface {
 	Count(commentID string) (int, error)
 	ListUser(userID string, offset, limit, page int) ([]models.ResponseComment, error)
 	CountUser(userID string) (int, error)
+	Find(responseCommentID string) (*models.ResponseComment, error)
 	Update(entity *models.ResponseComment) error
 	Remove(responseCommentID string) error
 }
@@ -220,6 +221,42 @@ func (r *responseCommentRepositoryImpl) CountUser(userID string) (int, error) {
 
 	return count, nil
 }
+
+func (r *responseCommentRepositoryImpl) Find(responseCommentID string) (*models.ResponseComment, error) {
+	db, err := databaseConn.Connect()
+	if err != nil {
+		return nil, err
+	}
+	defer db.Close()
+
+	sqlText := `
+		SELECT 
+			id,
+			title,
+			content,
+			comment_cid,
+			user_uid
+		FROM tb_response_comment
+		WHERE deleted_at is null and id = $1
+	`
+
+	rows, err := db.Query(sqlText, responseCommentID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	if rows.Next() {
+		responseComment, err := r.scanIterator(rows)
+		if err != nil {
+			return nil, err
+		}
+		return responseComment, nil
+	}
+
+	return nil, errors.New(messages.FindError)
+}
+
 func (r *responseCommentRepositoryImpl) Update(entity *models.ResponseComment) error {
 	db, err := databaseConn.Connect()
 	if err != nil {

@@ -1,7 +1,10 @@
 package service
 
 import (
+	"crypto/rand"
 	"errors"
+	"fmt"
+	"io"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,6 +26,10 @@ type userServiceInterface interface {
 	Update(id, name, telefone, nick, email, kind string) error
 	Remove(id string) error
 	Login(emailOrNick, secret string) (string, error)
+	SendCodeGeneratedToEmail(email string) error
+	VerificCode(code string) (string, error)
+	SecretRecovery(newSecret string) error
+	SecretUpdate(oldSecret, newSecret string) error
 }
 
 type userServiceImpl struct {
@@ -400,6 +407,172 @@ func (s *userServiceImpl) Login(emailOrNick, secret string) (string, error) {
 	}
 	// return atoken
 	return atoken, nil
+}
+
+func (s *userServiceImpl) SendCodeGeneratedToEmail(email string) error {
+	// valide email
+	val := validator.NewValidator()
+	emailVal, err := val.CheckAnyData("email", 255, email, true)
+	if err != nil {
+		return err
+	}
+
+	// varific email if exits
+	repUser := repository.NewUserRepository()
+	userEntity, err := repUser.FindByEmailOrNick(emailVal.(string))
+	if err != nil {
+		return err
+	}
+
+	// generated code number
+
+	var generatedCode string
+	for {
+		var table = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+		codeNumber := make([]byte, 6)
+		n, err := io.ReadAtLeast(rand.Reader, codeNumber, 6)
+		if n != 6 {
+			return err
+		}
+		for i := 0; i < len(codeNumber); i++ {
+			codeNumber[i] = table[int(codeNumber[i])%len(table)]
+		}
+
+		repCodeRecovery := repository.NewCodeRecoveryRepository()
+
+		// verific if code exits
+		_, err = repCodeRecovery.Find(string(codeNumber))
+		if err != nil {
+			generatedCode = string(codeNumber)
+			break
+		}
+
+	}
+
+	// configuring the email to send
+	var template = fmt.Sprintf(`
+		<html>
+			<head>
+				<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+				<title>Código de Recuperação!</title>
+			</head>
+			<body>
+				<p>Olá %s, aqui está o seu código de recuperação de senha: <mark>%s</mark></p>
+			</body>
+		<html/>
+	`, userEntity.Name, generatedCode)
+
+	// send email
+	systemService := NewSystemService()
+	err = systemService.SendEmail(template, userEntity.Email, "Seu código de Verificação!")
+	if err != nil {
+		return err
+	}
+
+	// salve code in database
+	codeRecoveryEntity := new(models.CodeRecovery)
+	codeRecoveryEntity.Code = generatedCode
+	codeRecoveryEntity.UserID = userEntity.UserID
+	codeRecoveryEntity.ExpiredAt = time.Now().Add(time.Minute * 5)
+	repCodeRecovery := repository.NewCodeRecoveryRepository()
+	err = repCodeRecovery.Store(codeRecoveryEntity)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *userServiceImpl) VerificCode(code string) (string, error) {
+	// valide camp
+	val := validator.NewValidator()
+	codeVal, err := val.CheckAnyData("código", 6, code, true)
+	if err != nil {
+		return "", err
+	}
+
+	// find code salve database
+	repCodeRecovery := repository.NewCodeRecoveryRepository()
+	entity, err := repCodeRecovery.Find(codeVal.(string))
+	if err != nil {
+		return "", err
+	}
+
+	// verific if code is expired
+	today := time.Now().Format("2006-01-02 15:04:05")
+	codeTime := entity.ExpiredAt.Format("2006-01-02 15:04:05")
+
+	// necessary conversion, for equal time type
+	newToday, _ := time.Parse("2006-01-02 15:04:05", today)
+	newCodeTime, _ := time.Parse("2006-01-02 15:04:05", codeTime)
+
+	if newCodeTime.Before(newToday) {
+		// delete code of database
+		err = repCodeRecovery.Remove(entity.Code)
+		if err != nil {
+			return "", err
+		}
+		return "", errors.New("Seu código está expirado!")
+	}
+
+	// generated token for recovery password
+	serviceAccess := NewAccessService()
+	token, err := serviceAccess.GenerateTokenRecovery(entity.UserID)
+	if err != nil {
+		return "", err
+	}
+
+	// delete code of database
+	err = repCodeRecovery.Remove(entity.Code)
+	if err != nil {
+		return "", err
+	}
+
+	// return token
+	return token, nil
+}
+
+func (s *userServiceImpl) SecretRecovery(newSecret string) error {
+	val := validator.NewValidator()
+	newSecretVal, err := val.CheckPassword(255, newSecret, "", "create")
+	if err != nil {
+		return err
+	}
+
+	repUser := repository.NewUserRepository()
+	err = repUser.UpdatePassword(newSecretVal, s.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *userServiceImpl) SecretUpdate(oldSecret, newSecret string) error {
+	val := validator.NewValidator()
+	newSecretVal, err := val.CheckPassword(255, newSecret, "", "create")
+	if err != nil {
+		return err
+	}
+
+	repUser := repository.NewUserRepository()
+	userPasswordDB, err := repUser.FindPassword(s.UserID)
+	if err != nil {
+		return err
+	}
+
+	_, err = val.CheckPassword(255, oldSecret, userPasswordDB, "compare")
+	if err != nil {
+		return err
+	}
+
+	err = repUser.UpdatePassword(newSecretVal, s.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
 func NewUserService(userID, kind string) userServiceInterface {
