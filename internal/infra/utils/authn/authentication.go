@@ -32,23 +32,31 @@ func Authenticate(nextFunction http.HandlerFunc) http.HandlerFunc {
 		tokenFunc := service.NewAccessService()
 		err := tokenFunc.ValidateAToken(r)
 
-		if err != nil && err.Error() == "Token is expired" {
+		if err != nil {
 
-			userID, err := tokenFunc.ExtractInvalideToken(r)
-			if err != nil {
+			if err.Error() == "Token is expired" {
+				userID, err := tokenFunc.ExtractInvalideToken(r)
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					response := responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 01, err, "ti")
+					responseAPI.EncodeResponse(nil, w, response)
+					return
+				}
+				atoken, err := tokenFunc.GenerateNewToken(userID)
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					response := responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 02, err, "ti")
+					responseAPI.EncodeResponse(nil, w, response)
+					return
+				}
+				r.Header.Set("Authorization", atoken)
+			} else {
 				w.WriteHeader(http.StatusUnauthorized)
-				response := responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 01, err, "ti")
+				response := responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 03, err, "ti")
 				responseAPI.EncodeResponse(nil, w, response)
 				return
 			}
-			atoken, err := tokenFunc.GenerateNewToken(userID)
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				response := responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 02, err, "ti")
-				responseAPI.EncodeResponse(nil, w, response)
-				return
-			}
-			r.Header.Set("Authorization", atoken)
+
 		}
 
 		nextFunction(w, r)

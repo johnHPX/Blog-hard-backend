@@ -105,8 +105,8 @@ func (s *systemServiceImpl) SendEmailComment(CommentIdOrResponseCommentId string
 				return err
 			}
 		}
-		return nil
 
+		return nil
 	}
 
 	// if false, is a response of comment of post
