@@ -1,21 +1,18 @@
 package service
 
 import (
-	"errors"
-
 	"github.com/google/uuid"
 
 	"github.com/johnHPX/blog-hard-backend/internal/domain/models"
 	"github.com/johnHPX/blog-hard-backend/internal/infra/repository"
-	"github.com/johnHPX/blog-hard-backend/internal/infra/utils/messages"
 	"github.com/johnHPX/validator-hard/pkg/validator"
 )
 
 type commentServiceInterface interface {
 	CreateComment(postID, title, content string) error
 	ListCommentsPost(postID string, offset, limit, page int) ([]models.Comment, int, error)
-	ListCommentsUser(userID string, offset, limit, page int) ([]models.Comment, int, error)
-	ListCommentsPostUser(postID, userID string, offset, limit, page int) ([]models.Comment, int, error)
+	ListCommentsUser(offset, limit, page int) ([]models.Comment, int, error)
+	ListCommentsPostUser(postID string, offset, limit, page int) ([]models.Comment, int, error)
 	FindComment(commentID string) (*models.Comment, error)
 	UpdateComment(commentID, title, content string) error
 	RemoveComment(commentID string) error
@@ -85,14 +82,10 @@ func (s *commentServiceImpl) ListCommentsPost(postID string, offset, limit, page
 	return commentsEntities, count, nil
 }
 
-func (s *commentServiceImpl) ListCommentsUser(userID string, offset, limit, page int) ([]models.Comment, int, error) {
-
-	if s.userID != userID && s.kind != "adm" {
-		return nil, 0, errors.New(messages.AnotherUser)
-	}
+func (s *commentServiceImpl) ListCommentsUser(offset, limit, page int) ([]models.Comment, int, error) {
 
 	val := validator.NewValidator()
-	userIDval, err := val.CheckAnyData("post id", 36, userID, true)
+	userIDval, err := val.CheckAnyData("post id", 36, s.userID, true)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -102,7 +95,7 @@ func (s *commentServiceImpl) ListCommentsUser(userID string, offset, limit, page
 	if err != nil {
 		return nil, 0, err
 	}
-	count, err := repComment.CountUser(userID)
+	count, err := repComment.CountUser(s.userID)
 	if err != nil {
 		return nil, 0, err
 	}
@@ -110,18 +103,14 @@ func (s *commentServiceImpl) ListCommentsUser(userID string, offset, limit, page
 	return commentsEntities, count, nil
 }
 
-func (s *commentServiceImpl) ListCommentsPostUser(postID, userID string, offset, limit, page int) ([]models.Comment, int, error) {
-
-	if s.userID != userID && s.kind != "adm" {
-		return nil, 0, errors.New(messages.AnotherUser)
-	}
+func (s *commentServiceImpl) ListCommentsPostUser(postID string, offset, limit, page int) ([]models.Comment, int, error) {
 
 	val := validator.NewValidator()
 	postIDval, err := val.CheckAnyData("post id", 36, postID, true)
 	if err != nil {
 		return nil, 0, err
 	}
-	userIDval, err := val.CheckAnyData("post id", 36, postID, true)
+	userIDval, err := val.CheckAnyData("post id", 36, s.userID, true)
 	if err != nil {
 		return nil, 0, err
 	}

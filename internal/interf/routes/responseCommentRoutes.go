@@ -21,7 +21,7 @@ var responseComment = []Router{
 	},
 	{
 		TokenIsReq: true,
-		Path:       "/response/comment/list/user/id/{userID}",
+		Path:       "/response/comment/list/user",
 		EndPointer: resource.ResponseCommentListUserHandler().ServeHTTP,
 		Method:     http.MethodGet,
 	},

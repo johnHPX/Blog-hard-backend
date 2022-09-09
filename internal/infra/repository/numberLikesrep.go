@@ -138,7 +138,8 @@ func (r *numberLikesRepositoryImpl) Find(postID, userID string) (*models.NumberL
 		SELECT 
 			id,
 			user_uid,
-			post_pid
+			post_pid,
+			value_like
 		FROM tb_number_likes 
 		WHERE deleted_at is null and
 			post_pid = $1 and user_uid = $2
@@ -172,7 +173,7 @@ func (r *numberLikesRepositoryImpl) Update(id string, value bool) error {
 
 	sqlText := `
 		UPDATE tb_number_likes SET
-			value_like = $2
+			value_like = $2,
 			updated_at = now()
 		WHERE deleted_at is null and id = $1
 	`

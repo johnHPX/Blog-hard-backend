@@ -30,9 +30,17 @@ func (s *numberLikesServiceImpl) LikePost(postID string) error {
 
 	repNumberLikes := repository.NewNumberLikerRepository()
 
-	_, err = repNumberLikes.Find(postID, s.userID)
+	numberLikesEntity, err := repNumberLikes.Find(postID, s.userID)
 	if err == nil {
-		return errors.New(messages.LikePost)
+		if numberLikesEntity.ValueLike {
+			return errors.New(messages.LikePost)
+		} else {
+			err = repNumberLikes.Update(numberLikesEntity.NumberLikesID, true)
+			if err != nil {
+				return err
+			}
+			return nil
+		}
 	}
 
 	nlid := uuid.New()
@@ -68,10 +76,7 @@ func (s *numberLikesServiceImpl) DislikePost(postID string) error {
 			return err
 		}
 	} else {
-		err = repNumberLikes.Update(entity.NumberLikesID, true)
-		if err != nil {
-			return err
-		}
+		return errors.New("esse post já foi discutido por você!")
 	}
 
 	return nil

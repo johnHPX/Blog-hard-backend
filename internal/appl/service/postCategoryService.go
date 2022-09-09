@@ -45,6 +45,12 @@ func (s *postCategoryServiceImpl) StorePostCategory(postID, categoryID string) e
 	postCategoryEntity.CategoryId = categoryIDval.(string)
 
 	repPostCategory := repository.NewPostCategoryRepository()
+
+	_, err = repPostCategory.Find(postIDval.(string), categoryIDval.(string))
+	if err == nil {
+		return errors.New("esse cadastro já foi realizado!")
+	}
+
 	err = repPostCategory.Store(postCategoryEntity)
 	if err != nil {
 		return err
@@ -71,6 +77,12 @@ func (s *postCategoryServiceImpl) RemovePostCategory(postID, categoryID string) 
 	}
 
 	repPostCategory := repository.NewPostCategoryRepository()
+
+	_, err = repPostCategory.Find(postIDval.(string), categoryIDval.(string))
+	if err != nil {
+		return errors.New("já foi deletetado ou não existe")
+	}
+
 	err = repPostCategory.Remove(postIDval.(string), categoryIDval.(string))
 	if err != nil {
 		return err

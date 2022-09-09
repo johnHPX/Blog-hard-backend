@@ -4,7 +4,7 @@ tanto as requisições quanto as respostas serão dadas por JSON.
 
 #### - _BODY_
 
-exemplos de JSON a serem enviados pelo corpo da requisição.
+exemplos de JSON a serem enviadoas pelo corpo da requisição.
 
 ```
 ## object
@@ -39,19 +39,23 @@ passando dados pela URL.
 
 # Rotas
 
-## 1. [HOST:PORT]/categoria
+## 1. [HOST:PORT]/user/store
 
-criando um nova categoria
+criando uma novo usuario
 
 #### - _Request_
 
-| request | type   | method |
-| ------- | ------ | ------ |
-| body    | object | POST   |
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | not               |
 
 | attribute name | type     | size  | is it required? | type send      | description                                      |
 | -------------- | -------- | ----- | --------------- | -------------- | ------------------------------------------------ |
-| `kind`         | `string` | `255` | `true`          | body paraments | tipo da categoria                                |
+| `name`         | `string` | `255` | `true`          | body paraments | nome do usuario                                  |
+| `telephone`    | `string` | `13`  | `true`          | body paraments | telefone do usuario                              |
+| `nick`         | `string` | `255` | `true`          | body paraments | nick do usuario                                  |
+| `email`        | `string` | `255` | `true`          | body paraments | email do usuario                                 |
+| `secret`       | `string` | `255` | `true`          | body paraments | senha do usuario                                 |
 | `mid`          | `string` | `-`   | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
 
 
@@ -66,9 +70,43 @@ criando um nova categoria
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
 
-## 2. [HOST:PORT]/categorias
+## 2. [HOST:PORT]/user/adm/store
 
-listando categorias
+criando usuário admin.
+somente usuario admin pode utilizar essa rota.
+
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type     | size  | is it required? | type send      | description                                      |
+| -------------- | -------- | ----- | --------------- | -------------- | ------------------------------------------------ |
+| `name`         | `string` | `255` | `true`          | body paraments | nome do usuario                                  |
+| `telephone`    | `string` | `13`  | `true`          | body paraments | telefone do usuario                              |
+| `nick`         | `string` | `255` | `true`          | body paraments | nick do usuario                                  |
+| `email`        | `string` | `255` | `true`          | body paraments | email do usuario                                 |
+| `secret`       | `string` | `255` | `true`          | body paraments | senha do usuario                                 |
+| `mid`          | `string` | `-`   | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+
+## 2. [HOST:PORT]/user/adm/store
+
+criando usuário admin.
+somente usuario admin pode utilizar essa rota.
 
 #### - _Request_
 

@@ -4,7 +4,7 @@ var (
 	AdmMessage      = "Essa funcionalidade só permitida ao admin do site"
 	AnotherUser     = "Não pode manipular dados de outro usuário"
 	UserBlocked     = "Seu usuario foi bloqueado! Não será possivel se autenticar no site"
-	LikePost        = "Só pode curtir uma vez qualquer publicação"
+	LikePost        = "Só pode curtir uma vez por publicação"
 	DeslikePost     = "Não pode descutir uma publicação que não foi curtida por você"
 	TokenBlocked    = "Token de reflash está bloqueado"
 	InvalideToken   = "Esse token não é valido"
