@@ -125,12 +125,6 @@ func makePostListEndPoint() endpoint.Endpoint {
 			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1003, errors.New("invalid request"), "na")
 		}
 
-		// tokenFunc := service.NewAccessService()
-		// userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
-		// if err != nil {
-		// 	return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1004, err, req.MID)
-		// }
-
 		service := service.NewPostService("", "")
 		posts, err := service.List(req.Offset, req.Limit, req.Page)
 		if err != nil {

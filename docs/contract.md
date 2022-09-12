@@ -282,7 +282,7 @@ remover um usuario por id.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-# 8. [HOST:PORT]/user/login
+## 8. [HOST:PORT]/user/login
 
 fazer login no sistema
 
@@ -309,7 +309,7 @@ fazer login no sistema
 | `token`        | `string`   | token de acesso a aplicação                      |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-# 9. [HOST:PORT]/user/recor/email
+## 9. [HOST:PORT]/user/recor/email
 
 primeiro estagio de recuperação de senha.
 enviar um codigo valido ao email do usuario.
@@ -335,7 +335,7 @@ enviar um codigo valido ao email do usuario.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-# 10. [HOST:PORT]/user/verific/code
+## 10. [HOST:PORT]/user/verific/code
 
 segundo estagio de recuperação de senha.
 conferi o codigo enviado e devover um token especial.
@@ -362,7 +362,7 @@ conferi o codigo enviado e devover um token especial.
 | `token`        | `string`   | token especial para recuperção de senha          |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-# 11. [HOST:PORT]/user/password/recovery
+## 11. [HOST:PORT]/user/password/recovery
 
 terceiro estagio de recuperação de senha.
 atualizar senha do usuario.
@@ -388,7 +388,7 @@ atualizar senha do usuario.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-# 12. [HOST:PORT]/user/password/update
+## 12. [HOST:PORT]/user/password/update
 
 atualizar senha do usuario.
 
@@ -418,6 +418,232 @@ atualizar senha do usuario.
 <hr>
 <h1> POST Routes </h1>
 
+## 13. [HOST:PORT]/post/store
+
+criando uma postagem.
+somente usuario admin pode utilizar essa rota.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type value | size   | is it required? | type send      | description                                      |
+| -------------- | ---------- | ------ | --------------- | -------------- | ------------------------------------------------ |
+| `title`        | `string`   | `255`  | `true`          | body paraments | titulo da postagem                               |
+| `content`      | `string`   | `9999` | `true`          | body paraments | conteudo da postagem                             |
+| `mid`          | `string`   | `-`    | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 14. [HOST:PORT]/post/list
+
+listando todas as postagens
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | not               |
+
+| attribute name | type value | size | is it required? | type send         | description                                         |
+| -------------- | ---------- | ---- | --------------- | ----------------- | --------------------------------------------------- |
+| `offset`       | `int`      | `-`  | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`  | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`  | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `count`        | `int`      | numero total de dados do banco dessa query       |
+| `posts`        | `[]Post`   | array de posts                                   |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+| Post      | type     | description                 |
+| --------- | -------- | --------------------------- |
+| `postID`  | `string` | id da postagem              |
+| `title`   | `string` | titulo da postagem          |
+| `content` | `string` | conteudo da postagem        |
+| `likes`   | `int`    | numero de likes da postagem |
+
+## 15. [HOST:PORT]/post/list/title/{title}
+
+listando todas as postagens por titulo
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | not               |
+
+| attribute name | type value | size  | is it required? | type send         | description                                         |
+| -------------- | ---------- | ----- | --------------- | ----------------- | --------------------------------------------------- |
+| `title`        | `string`   | `255` | `true`          | url paraments     | titulo do post                                      |
+| `offset`       | `int`      | `-`   | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`   | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`   | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`   | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `count`        | `int`      | numero total de dados do banco dessa query       |
+| `posts`        | `[]Post`   | array de posts                                   |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+| Post      | type     | description                 |
+| --------- | -------- | --------------------------- |
+| `postID`  | `string` | id da postagem              |
+| `title`   | `string` | titulo da postagem          |
+| `content` | `string` | conteudo da postagem        |
+| `likes`   | `int`    | numero de likes da postagem |
+
+## 16. [HOST:PORT]/post/list/category/name/{category}
+
+listando todas as postagens por categoria
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | not               |
+
+| attribute name | type value | size  | is it required? | type send         | description                                         |
+| -------------- | ---------- | ----- | --------------- | ----------------- | --------------------------------------------------- |
+| `category`     | `string`   | `255` | `true`          | url paraments     | categoria vinculada ao post                         |
+| `offset`       | `int`      | `-`   | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`   | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`   | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`   | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `count`        | `int`      | numero total de dados do banco dessa query       |
+| `posts`        | `[]Post`   | array de posts                                   |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+| Post      | type     | description                 |
+| --------- | -------- | --------------------------- |
+| `postID`  | `string` | id da postagem              |
+| `title`   | `string` | titulo da postagem          |
+| `content` | `string` | conteudo da postagem        |
+| `likes`   | `int`    | numero de likes da postagem |
+
+## 17. [HOST:PORT]/post/find/id/{id}
+
+buscando uma postagem pelo id
+somente admins podem usar essa rota.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| body    | -    | GET    | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id do post                                       |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                 |
+| -------------- | -------- | --------------------------- |
+| `postID`       | `string` | id da postagem              |
+| `title`        | `string` | titulo da postagem          |
+| `content`      | `string` | conteudo da postagem        |
+| `likes`        | `int`    | numero de likes da postagem |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+
+## 18. [HOST:PORT]/post/update/id/{id}
+
+atualizando uma postagem.
+somente usuario admin pode utilizar essa rota.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type value | size   | is it required? | type send      | description                                      |
+| -------------- | ---------- | ------ | --------------- | -------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36`   | `true`          | url paraments  | id da postagem                                   |
+| `title`        | `string`   | `255`  | `true`          | body paraments | titulo da postagem                               |
+| `content`      | `string`   | `9999` | `true`          | body paraments | conteudo da postagem                             |
+| `mid`          | `string`   | `-`    | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 19. [HOST:PORT]/post/remove/id/{id}
+
+removendo uma postagem pelo id
+somente admins podem usar essa rota.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| body    | -    | GET    | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id do post                                       |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                 |
+| -------------- | -------- | --------------------------- |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+<hr>
+<h1> Category Routes </h1>
 
 
 the end!
