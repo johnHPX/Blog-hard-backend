@@ -1273,7 +1273,166 @@ remover um comentario de resposta.
 
 | attribute name | type value | size | is it required? | type send         | description                                      |
 | -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
-| `id`           | `string`   | `36` | `true`          | url paraments     | id do comentario                                 |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id do comentario de resposta                     |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+<hr>
+<h1> config Routes </h1>
+
+## 41. [HOST:PORT]/config/store
+
+criar uma configuração.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type value | size | is it required? | type send      | description                                      |
+| -------------- | ---------- | ---- | --------------- | -------------- | ------------------------------------------------ |
+| `collors`      | `[]string` | `-`  | `true`          | body paraments | cores do site                                    |
+| `links`        | `[]string` | `-`  | `true`          | body paraments | links do menu do site                            |
+| `menuAncoras`  | `[]string` | `-`  | `true`          | body paraments | ancoras do menu                                  |
+| `banner`       | `string`   | `-`  | `true`          | body paraments | url do banner                                    |
+| `mid`          | `string`   | `-`  | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 42. [HOST:PORT]/config/list
+
+listando todas as configurações.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                         |
+| -------------- | ---------- | ---- | --------------- | ----------------- | --------------------------------------------------- |
+| `offset`       | `int`      | `-`  | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`  | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`  | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `count`        | `int`      | numero total de dados do banco dessa query       |
+| `configs`      | `[]Config` | array de configs                                 |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+| Config        | type     | description        |
+| ------------- | -------- | ------------------ |
+| `configID`    | `string` | id da configuração |
+| `collors`     | `string` | cores do site      |
+| `links`       | `string` | links do menu      |
+| `menuAncoras` | `string` | ancoras do menu    |
+| `banner`      | `string` | url do banner      |
+
+## 43. [HOST:PORT]/config/find/id/{id}
+
+buscando uma configuração pelo id.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `int`      | `-`  | `true`          | queries paraments | id da configuração                               |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `configID`     | `string` | id da configuração                               |
+| `collors`      | `string` | cores do site                                    |
+| `links`        | `string` | links do menu                                    |
+| `menuAncoras`  | `string` | ancoras do menu                                  |
+| `banner`       | `string` | url do banner                                    |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+
+## 44. [HOST:PORT]/config/update/id/{id}
+
+atualizando uma configuração.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | PUT    | yes               |
+
+| attribute name | type value | size | is it required? | type send      | description                                      |
+| -------------- | ---------- | ---- | --------------- | -------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments  | id da configuração                               |
+| `collors`      | `[]string` | `-`  | `true`          | body paraments | cores do site                                    |
+| `links`        | `[]string` | `-`  | `true`          | body paraments | links do menu do site                            |
+| `menuAncoras`  | `[]string` | `-`  | `true`          | body paraments | ancoras do menu                                  |
+| `banner`       | `string`   | `-`  | `true`          | body paraments | url do banner                                    |
+| `mid`          | `string`   | `-`  | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 45. [HOST:PORT]/config/remove/id/{id}
+
+remover uma configuração.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| body    | -    | DELETE | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id da configuração                               |
 | `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
 
 #### - _Response_
