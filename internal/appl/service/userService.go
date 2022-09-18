@@ -30,6 +30,7 @@ type userServiceInterface interface {
 	VerificCode(code string) (string, error)
 	SecretRecovery(newSecret string) error
 	SecretUpdate(oldSecret, newSecret string) error
+	Logout() error
 }
 
 type userServiceImpl struct {
@@ -573,6 +574,23 @@ func (s *userServiceImpl) SecretUpdate(oldSecret, newSecret string) error {
 
 	return nil
 
+}
+
+func (s *userServiceImpl) Logout() error {
+	accessRep := repository.NewAccessRepository()
+	// verific if exist rtoken
+	_, err := accessRep.FindToken(s.UserID)
+	if err != nil {
+		return err
+	}
+
+	// removing rtoken
+	err = accessRep.RemoveToken(s.UserID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewUserService(userID, kind string) userServiceInterface {

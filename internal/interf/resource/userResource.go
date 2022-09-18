@@ -787,3 +787,59 @@ func UserPasswordUpdateHandler() http.Handler {
 		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
 	)
 }
+
+type userLogoutRequest struct {
+	MID     string `json:"mid"`
+	Request *http.Request
+}
+
+type userLogoutResponse struct {
+	MID string `json:"mid"`
+}
+
+func decodeUserLogoutRequest(ctx context.Context, r *http.Request) (interface{}, error) {
+	dto := new(userLogoutRequest)
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(dto)
+	if err != nil {
+		return nil, err
+	}
+	dto.Request = r
+	return dto, nil
+}
+
+func makeUserLogoutendPoint() endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		// retrieve request data
+		req, ok := request.(*userLogoutRequest)
+		if !ok {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusBadRequest, 1023, errors.New("invalid request"), "na")
+		}
+
+		// gets token's informations
+		tokenFunc := service.NewAccessService()
+		userToken, err := tokenFunc.ExtractTokenInfo(req.Request)
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusUnauthorized, 1033, err, req.MID)
+		}
+
+		service := service.NewUserService(userToken.UserID, userToken.Kind)
+		err = service.Logout()
+		if err != nil {
+			return nil, responseAPI.CreateHttpErrorResponse(http.StatusInternalServerError, 1024, err, req.MID)
+		}
+
+		return &userLogoutResponse{
+			MID: req.MID,
+		}, nil
+	}
+}
+
+func UserLogoutHandler() http.Handler {
+	return httptransport.NewServer(
+		makeUserLogoutendPoint(),
+		decodeUserLogoutRequest,
+		responseAPI.EncodeResponse,
+		httptransport.ServerErrorEncoder(responseAPI.ErrorEncoder()),
+	)
+}

@@ -79,4 +79,10 @@ var userRoutes = []Router{
 		EndPointer: resource.UserPasswordUpdateHandler().ServeHTTP,
 		Method:     http.MethodPut,
 	},
+	{
+		TokenIsReq: true,
+		Path:       "/user/logout",
+		EndPointer: resource.UserLogoutHandler().ServeHTTP,
+		Method:     http.MethodPost,
+	},
 }
