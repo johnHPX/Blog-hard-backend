@@ -87,7 +87,7 @@ criando uma novo usuario
 ## 2. [HOST:PORT]/user/adm/store
 
 criando usuário admin.
-somente usuario admin pode utilizar essa rota.
+somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
 
@@ -117,7 +117,7 @@ somente usuario admin pode utilizar essa rota.
 ## 3. [HOST:PORT]/user/list
 
 listando todos os usuarios
-somente usuario admin pode utilizar essa rota.
+somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
 
@@ -157,7 +157,7 @@ somente usuario admin pode utilizar essa rota.
 ## 4. [HOST:PORT]/user/list/name/{name}
 
 listando usuarios pelo nome
-somente usuario adimin tem acesso a essa rota
+somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
 
@@ -197,7 +197,7 @@ somente usuario adimin tem acesso a essa rota
 ## 5. [HOST:PORT]/user/find/id/{id}
 
 buscar um usuario pelo id.
-somente admins podem usar essa rota.
+somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
 
@@ -421,7 +421,7 @@ atualizar senha do usuario.
 ## 13. [HOST:PORT]/post/store
 
 criando uma postagem.
-somente usuario admin pode utilizar essa rota.
+somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
 
@@ -558,7 +558,7 @@ listando todas as postagens por categoria
 ## 17. [HOST:PORT]/post/find/id/{id}
 
 buscando uma postagem pelo id
-somente admins podem usar essa rota.
+somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
 
@@ -578,25 +578,25 @@ somente admins podem usar essa rota.
 | body    | object | 200    |
 
 
-| attribute name | type     | description                 |
-| -------------- | -------- | --------------------------- |
-| `postID`       | `string` | id da postagem              |
-| `title`        | `string` | titulo da postagem          |
-| `content`      | `string` | conteudo da postagem        |
-| `likes`        | `int`    | numero de likes da postagem |
-| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `postID`       | `string` | id da postagem                                   |
+| `title`        | `string` | titulo da postagem                               |
+| `content`      | `string` | conteudo da postagem                             |
+| `likes`        | `int`    | numero de likes da postagem                      |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
 
 ## 18. [HOST:PORT]/post/update/id/{id}
 
 atualizando uma postagem.
-somente usuario admin pode utilizar essa rota.
+somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
 
 | request | type   | method | token is required |
 | ------- | ------ | ------ | ----------------- |
-| body    | object | POST   | yes               |
+| body    | object | PUT    | yes               |
 
 | attribute name | type value | size   | is it required? | type send      | description                                      |
 | -------------- | ---------- | ------ | --------------- | -------------- | ------------------------------------------------ |
@@ -618,7 +618,435 @@ somente usuario admin pode utilizar essa rota.
 ## 19. [HOST:PORT]/post/remove/id/{id}
 
 removendo uma postagem pelo id
-somente admins podem usar essa rota.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| body    | -    | DELETE | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id do post                                       |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+<hr>
+<h1> Category Routes </h1>
+
+## 20. [HOST:PORT]/category/store
+
+criando uma categoria.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type value | size  | is it required? | type send      | description                                      |
+| -------------- | ---------- | ----- | --------------- | -------------- | ------------------------------------------------ |
+| `name`         | `string`   | `255` | `true`          | body paraments | nome da categoria                                |
+| `mid`          | `string`   | `-`   | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 21. [HOST:PORT]/category/list
+
+listando todas as categorias
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | not               |
+
+| attribute name | type value | size | is it required? | type send         | description                                         |
+| -------------- | ---------- | ---- | --------------- | ----------------- | --------------------------------------------------- |
+| `offset`       | `int`      | `-`  | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`  | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`  | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value   | description                                      |
+| -------------- | ------------ | ------------------------------------------------ |
+| `count`        | `int`        | numero total de dados do banco dessa query       |
+| `categorys`    | `[]Category` | array de categorys                               |
+| `mid`          | `string`     | mensagem da resposta caso o codigo http seja 200 |
+
+| Category     | type     | description      |
+| ------------ | -------- | ---------------- |
+| `categoryID` | `string` | id da category   |
+| `name`       | `string` | nome da category |
+
+## 22. [HOST:PORT]/category/find/id/{id}
+
+buscando uma categoria pelo id
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| body    | -    | GET    | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id do categoria                                  |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `categoryID`   | `string` | id da categoria                                  |
+| `name`         | `string` | nome da categoria                                |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+
+## 23. [HOST:PORT]/category/update/id/{id}
+
+atualizando uma categoria.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | PUT    | yes               |
+
+| attribute name | type value | size  | is it required? | type send      | description                                      |
+| -------------- | ---------- | ----- | --------------- | -------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36`  | `true`          | url paraments  | id da categoria                                  |
+| `name`         | `string`   | `255` | `true`          | body paraments | nome da categoria                                |
+| `mid`          | `string`   | `-`   | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 24. [HOST:PORT]/category/remove/id/{id}
+
+removendo uma categoria pelo id
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| body    | -    | DELETE | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id da categoria                                  |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+<hr>
+<h1> Post Category Routes </h1>
+
+## 25. [HOST:PORT]/post/category/store
+
+criando uma relação entre categoria e postagem.
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type value | size | is it required? | type send      | description                                      |
+| -------------- | ---------- | ---- | --------------- | -------------- | ------------------------------------------------ |
+| `postID`       | `string`   | `36` | `true`          | body paraments | id da postagem                                   |
+| `categoryId`   | `string`   | `36` | `true`          | body paraments | id da categoria                                  |
+| `mid`          | `string`   | `-`  | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 26. [HOST:PORT]/category/remove/id/{id}
+
+removendo uma categoria pelo id
+somente usuario admin pode utilizar esse endpoint.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | DELETE | yes               |
+
+| attribute name | type value | size | is it required? | type send      | description                                      |
+| -------------- | ---------- | ---- | --------------- | -------------- | ------------------------------------------------ |
+| `postID`       | `string`   | `36` | `true`          | body paraments | id da postagem                                   |
+| `categoryId`   | `string`   | `36` | `true`          | body paraments | id da categoria                                  |
+| `mid`          | `string`   | `-`  | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+<hr>
+<h1> numberLikes Routes </h1>
+
+## 27. [HOST:PORT]/user/post/like
+
+curtir postagem.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type value | size | is it required? | type send      | description                                      |
+| -------------- | ---------- | ---- | --------------- | -------------- | ------------------------------------------------ |
+| `postID`       | `string`   | `36` | `true`          | body paraments | id da postagem                                   |
+| `mid`          | `string`   | `-`  | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 28. [HOST:PORT]/user/post/dislike
+
+descurtir uma postagem.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | DELETE | yes               |
+
+| attribute name | type value | size | is it required? | type send      | description                                      |
+| -------------- | ---------- | ---- | --------------- | -------------- | ------------------------------------------------ |
+| `postID`       | `string`   | `36` | `true`          | body paraments | id da postagem                                   |
+| `mid`          | `string`   | `-`  | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+<hr>
+<h1> comment Routes </h1>
+
+## 29. [HOST:PORT]/comment/store
+
+criar comentario de uma postagem.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type value | size   | is it required? | type send      | description                                      |
+| -------------- | ---------- | ------ | --------------- | -------------- | ------------------------------------------------ |
+| `postID`       | `string`   | `36`   | `true`          | body paraments | id da postagem                                   |
+| `title`        | `string`   | `255`  | `true`          | body paraments | titulo do comentario                             |
+| `content`      | `string`   | `2024` | `true`          | body paraments | conteudo do comentario                           |
+| `mid`          | `string`   | `-`    | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 30. [HOST:PORT]/comment/list/post/id/{postID}
+
+listando todos os comentarios de uma postagem.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | not               |
+
+| attribute name | type value | size | is it required? | type send         | description                                         |
+| -------------- | ---------- | ---- | --------------- | ----------------- | --------------------------------------------------- |
+| `postID`       | `string`   | `36` | `true`          | url paraments     | id da postagem                                      |
+| `offset`       | `int`      | `-`  | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`  | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`  | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value  | description                                      |
+| -------------- | ----------- | ------------------------------------------------ |
+| `count`        | `int`       | numero total de dados do banco dessa query       |
+| `comments`     | `[]Comment` | array de comments                                |
+| `mid`          | `string`    | mensagem da resposta caso o codigo http seja 200 |
+
+| Comment     | type     | description          |
+| ----------- | -------- | -------------------- |
+| `commentID` | `string` | id do comentario     |
+| `title`     | `string` | titulo da postagem   |
+| `content`   | `string` | conteudo da postagem |
+| `userID`    | `string` | id do usuario        |
+| `postID`    | `string` | id do post           |
+
+## 31. [HOST:PORT]/comment/list/user
+
+listando todos os comentarios do usuario.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                         |
+| -------------- | ---------- | ---- | --------------- | ----------------- | --------------------------------------------------- |
+| `offset`       | `int`      | `-`  | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`  | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`  | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value  | description                                      |
+| -------------- | ----------- | ------------------------------------------------ |
+| `count`        | `int`       | numero total de dados do banco dessa query       |
+| `comments`     | `[]Comment` | array de comments                                |
+| `mid`          | `string`    | mensagem da resposta caso o codigo http seja 200 |
+
+| Comment     | type     | description          |
+| ----------- | -------- | -------------------- |
+| `commentID` | `string` | id do comentario     |
+| `title`     | `string` | titulo da postagem   |
+| `content`   | `string` | conteudo da postagem |
+| `userID`    | `string` | id do usuario        |
+| `postID`    | `string` | id do post           |
+
+## 32. [HOST:PORT]/comment/list/user/post/id/{postID}
+
+listando todos os comentarios de um usuario em uma postagem.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                         |
+| -------------- | ---------- | ---- | --------------- | ----------------- | --------------------------------------------------- |
+| `postID`       | `string`   | `36` | `true`          | url paraments     | id do post                                          |
+| `offset`       | `int`      | `-`  | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`  | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`  | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value  | description                                      |
+| -------------- | ----------- | ------------------------------------------------ |
+| `count`        | `int`       | numero total de dados do banco dessa query       |
+| `comments`     | `[]Comment` | array de comments                                |
+| `mid`          | `string`    | mensagem da resposta caso o codigo http seja 200 |
+
+| Comment     | type     | description          |
+| ----------- | -------- | -------------------- |
+| `commentID` | `string` | id do comentario     |
+| `title`     | `string` | titulo da postagem   |
+| `content`   | `string` | conteudo da postagem |
+| `userID`    | `string` | id do usuario        |
+| `postID`    | `string` | id do post           |
+
+## 33. [HOST:PORT]/comment/find/id/{id}
+
+buscando um comentario pelo id.
 
 #### - _Request_
 
@@ -638,13 +1066,226 @@ somente admins podem usar essa rota.
 | body    | object | 200    |
 
 
-| attribute name | type     | description                 |
-| -------------- | -------- | --------------------------- |
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `commentID`    | `string` | id do comentario                                 |
+| `title`        | `string` | titulo da postagem                               |
+| `content`      | `string` | conteudo da postagem                             |
+| `userID`       | `string` | id do usuario                                    |
+| `postID`       | `string` | id do post                                       |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+## 34. [HOST:PORT]/comment/update/id/{id}
+
+atualizando um comentario.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | PUT    | yes               |
+
+| attribute name | type value | size   | is it required? | type send      | description                                      |
+| -------------- | ---------- | ------ | --------------- | -------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36`   | `true`          | url paraments  | id da categoria                                  |
+| `title`        | `string`   | `255`  | `true`          | body paraments | titulo do comentario                             |
+| `content`      | `string`   | `2024` | `true`          | body paraments | conteudo do comentario                           |
+| `mid`          | `string`   | `-`    | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-<hr>
-<h1> Category Routes </h1>
+## 35. [HOST:PORT]/comment/remove/id/{id}
 
+remover um comentario.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| body    | -    | DELETE | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id do comentario                                 |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
+
+<hr>
+<h1> response comment Routes </h1>
+
+## 36. [HOST:PORT]/response/comment/store
+
+responder a um comentario de um usuario.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | POST   | yes               |
+
+| attribute name | type value | size   | is it required? | type send      | description                                      |
+| -------------- | ---------- | ------ | --------------- | -------------- | ------------------------------------------------ |
+| `commentId`    | `string`   | `36`   | `true`          | body paraments | id do comentario                                 |
+| `title`        | `string`   | `255`  | `true`          | body paraments | titulo do comentario de resposta                 |
+| `content`      | `string`   | `2024` | `true`          | body paraments | conteudo do comentario  de resposta              |
+| `mid`          | `string`   | `-`    | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 37. [HOST:PORT]/response/comment/list/comment/id/{commentID}
+
+listando todos os comentarios de resposta de um comentario.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | not               |
+
+| attribute name | type value | size | is it required? | type send         | description                                         |
+| -------------- | ---------- | ---- | --------------- | ----------------- | --------------------------------------------------- |
+| `commentID`    | `string`   | `36` | `true`          | url paraments     | id do comentario                                    |
+| `offset`       | `int`      | `-`  | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`  | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`  | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name     | type value          | description                                      |
+| ------------------ | ------------------- | ------------------------------------------------ |
+| `count`            | `int`               | numero total de dados do banco dessa query       |
+| `responsecomments` | `[]ResponseComment` | array de response comments                       |
+| `mid`              | `string`            | mensagem da resposta caso o codigo http seja 200 |
+
+| ResponseComment     | type     | description                        |
+| ------------------- | -------- | ---------------------------------- |
+| `responseCommentID` | `string` | id do comentario de resposta       |
+| `title`             | `string` | titulo do comentario de resposta   |
+| `content`           | `string` | conteudo do comentario de resposta |
+| `commentID`         | `string` | id do comentario                   |
+| `userID`            | `string` | id do usuario                      |
+
+## 38. [HOST:PORT]/response/comment/list/user
+
+listando todos os comentarios de resposta de um usuario.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| queries | -    | GET    | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                         |
+| -------------- | ---------- | ---- | --------------- | ----------------- | --------------------------------------------------- |
+| `offset`       | `int`      | `-`  | `false`         | queries paraments | deslocamento inicial dos dados trazidos             |
+| `limit`        | `int`      | `-`  | `false`         | queries paraments | limite padrão de quantos dados serão trazidos       |
+| `page`         | `int`      | `-`  | `false`         | queries paraments | o numero da pagina na qual os dados estão agrupados |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200    |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name     | type value          | description                                      |
+| ------------------ | ------------------- | ------------------------------------------------ |
+| `count`            | `int`               | numero total de dados do banco dessa query       |
+| `responsecomments` | `[]ResponseComment` | array de response comments                       |
+| `mid`              | `string`            | mensagem da resposta caso o codigo http seja 200 |
+
+| ResponseComment     | type     | description                        |
+| ------------------- | -------- | ---------------------------------- |
+| `responseCommentID` | `string` | id do comentario de resposta       |
+| `title`             | `string` | titulo do comentario de resposta   |
+| `content`           | `string` | conteudo do comentario de resposta |
+| `commentID`         | `string` | id do comentario                   |
+| `userID`            | `string` | id do usuario                      |
+
+
+## 39. [HOST:PORT]/response/comment/update/id/{id}
+
+atualizando um comentario de resposta.
+
+#### - _Request_
+
+| request | type   | method | token is required |
+| ------- | ------ | ------ | ----------------- |
+| body    | object | PUT    | yes               |
+
+| attribute name | type value | size   | is it required? | type send      | description                                      |
+| -------------- | ---------- | ------ | --------------- | -------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36`   | `true`          | url paraments  | id do comentario de resposta                     |
+| `title`        | `string`   | `255`  | `true`          | body paraments | titulo do comentario de resposta                 |
+| `content`      | `string`   | `2024` | `true`          | body paraments | conteudo do comentario de resposta               |
+| `mid`          | `string`   | `-`    | `false`         | body paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+| attribute name | type value | description                                      |
+| -------------- | ---------- | ------------------------------------------------ |
+| `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
+
+## 40. [HOST:PORT]/response/comment/remove/id/{id}
+
+remover um comentario de resposta.
+
+#### - _Request_
+
+| request | type | method | token is required |
+| ------- | ---- | ------ | ----------------- |
+| body    | -    | DELETE | yes               |
+
+| attribute name | type value | size | is it required? | type send         | description                                      |
+| -------------- | ---------- | ---- | --------------- | ----------------- | ------------------------------------------------ |
+| `id`           | `string`   | `36` | `true`          | url paraments     | id do comentario                                 |
+| `mid`          | `string`   | `-`  | `false`         | queries paraments | mensagem da resposta caso o codigo http seja 200 |
+
+#### - _Response_
+
+| request | type   | status |
+| ------- | ------ | ------ |
+| body    | object | 200    |
+
+
+| attribute name | type     | description                                      |
+| -------------- | -------- | ------------------------------------------------ |
+| `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
 the end!
 made by Jonatas.

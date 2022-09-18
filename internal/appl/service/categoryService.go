@@ -53,10 +53,6 @@ func (s *categoryServiceImpl) CreateCategory(name string) error {
 
 func (s *categoryServiceImpl) ListCategory(offset, limit, page int) ([]models.Category, int, error) {
 
-	if s.kind != "adm" {
-		return nil, 0, errors.New(messages.AdmMessage)
-	}
-
 	repCategory := repository.NewCategoryRepository()
 	categoryEntities, err := repCategory.List(offset, limit, page)
 	if err != nil {
