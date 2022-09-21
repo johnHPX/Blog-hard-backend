@@ -70,7 +70,7 @@ passando dados pela URL.
 
 ## 1. /user/store
 
-criando uma novo usuario
+criando uma novo usuario.
 
 #### - _Request_
 
@@ -99,7 +99,7 @@ criando uma novo usuario
 
 ## 2. /user/adm/store
 
-criando usuário admin.
+criando usuário admin. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -129,7 +129,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 3. /user/list
 
-listando todos os usuarios
+listando todos os usuarios. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -169,7 +169,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 4. /user/list/name/{name}
 
-listando usuarios pelo nome
+listando usuarios pelo nome. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -209,7 +209,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 5. /user/find/id/{id}
 
-buscar um usuario pelo id.
+buscar um usuario pelo id. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -297,7 +297,7 @@ remover um usuario por id.
 
 ## 8. /user/login
 
-fazer login no sistema
+fazer login no sistema.
 
 #### - _Request_
 
@@ -324,7 +324,7 @@ fazer login no sistema
 
 ## 9. /user/logout
 
-fazer logout no sistema
+fazer logout no sistema.
 
 #### - _Request_
 
@@ -457,7 +457,7 @@ atualizar senha do usuario.
 
 ## 14. /post/store
 
-criando uma postagem.
+criando uma postagem. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -484,7 +484,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 15. /post/list
 
-listando todas as postagens
+listando todas as postagens.
 
 #### - _Request_
 
@@ -520,7 +520,7 @@ listando todas as postagens
 
 ## 16. /post/list/title/{title}
 
-listando todas as postagens por titulo
+listando todas as postagens por titulo.
 
 #### - _Request_
 
@@ -557,7 +557,7 @@ listando todas as postagens por titulo
 
 ## 17. /post/list/category/name/{category}
 
-listando todas as postagens por categoria
+listando todas as postagens por categoria.
 
 #### - _Request_
 
@@ -594,7 +594,7 @@ listando todas as postagens por categoria
 
 ## 18. /post/find/id/{id}
 
-buscando uma postagem pelo id
+buscando uma postagem pelo id. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -626,7 +626,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 19. /post/update/id/{id}
 
-atualizando uma postagem.
+atualizando uma postagem. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -654,7 +654,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 20. /post/remove/id/{id}
 
-removendo uma postagem pelo id
+removendo uma postagem pelo id. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -684,7 +684,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 22. /category/store
 
-criando uma categoria.
+criando uma categoria. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -710,7 +710,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 22. /category/list
 
-listando todas as categorias
+listando todas as categorias.
 
 #### - _Request_
 
@@ -744,7 +744,7 @@ listando todas as categorias
 
 ## 23. /category/find/id/{id}
 
-buscando uma categoria pelo id
+buscando uma categoria pelo id. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -774,7 +774,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 24. /category/update/id/{id}
 
-atualizando uma categoria.
+atualizando uma categoria. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -801,7 +801,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 25. /category/remove/id/{id}
 
-removendo uma categoria pelo id
+removendo uma categoria pelo id. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -831,7 +831,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 26. /post/category/store
 
-criando uma relação entre categoria e postagem.
+criando uma relação entre categoria e postagem. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -858,7 +858,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 27. /category/remove/id/{id}
 
-removendo uma categoria pelo id
+removendo uma categoria pelo id. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -1329,7 +1329,7 @@ remover um comentario de resposta.
 
 ## 42. /config/store
 
-criar uma configuração.
+criar uma configuração. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -1358,7 +1358,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 43. /config/list
 
-listando todas as configurações.
+listando todas as configurações. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -1396,7 +1396,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 44. /config/find/id/{id}
 
-buscando uma configuração pelo id.
+buscando uma configuração pelo id. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -1428,7 +1428,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 45. /config/update/id/{id}
 
-atualizando uma configuração.
+atualizando uma configuração. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
@@ -1458,7 +1458,7 @@ somente usuario admin pode utilizar esse endpoint.
 
 ## 46. /config/remove/id/{id}
 
-remover uma configuração.
+remover uma configuração. <br>
 somente usuario admin pode utilizar esse endpoint.
 
 #### - _Request_
