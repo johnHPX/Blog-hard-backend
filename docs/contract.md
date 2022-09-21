@@ -1,4 +1,4 @@
-# estrutura das requisições e respostas
+# Estrutura das Requisições e Respostas
 
 request e response serão enviadas por JSON.
 
@@ -51,11 +51,24 @@ passando dados pela URL.
   | description      | a descrição do atributo                                                                          |
   | status           | o status do response. exemplo: 200, 201...                                                       |
 
+  ```
+    OBS: MID é um codigo curto que o frontEnd pode enviar a API, com o intuito de verificar se a requisição ocorreu, sendo bem sucessido ou mal sucessido.
+
+    Dependendo do METHOD, ele pode ser enviado por BODY'S request ou QUERY'S request.
+    EXEMPLO:  
+    // body's request
+     "mid": "ok"
+
+    // query's request
+    ? mid=ok
+
+  ```
+
 <hr>
 <h1> USER Routes </h1>
 
 
-## 1. [HOST:PORT]/user/store
+## 1. /user/store
 
 criando uma novo usuario
 
@@ -84,7 +97,7 @@ criando uma novo usuario
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 2. [HOST:PORT]/user/adm/store
+## 2. /user/adm/store
 
 criando usuário admin.
 somente usuario admin pode utilizar esse endpoint.
@@ -114,7 +127,7 @@ somente usuario admin pode utilizar esse endpoint.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 3. [HOST:PORT]/user/list
+## 3. /user/list
 
 listando todos os usuarios
 somente usuario admin pode utilizar esse endpoint.
@@ -154,7 +167,7 @@ somente usuario admin pode utilizar esse endpoint.
 | `email`     | `string` | email do usuario   |
 | `kind`      | `string` | tipo do usuario    |
 
-## 4. [HOST:PORT]/user/list/name/{name}
+## 4. /user/list/name/{name}
 
 listando usuarios pelo nome
 somente usuario admin pode utilizar esse endpoint.
@@ -194,7 +207,7 @@ somente usuario admin pode utilizar esse endpoint.
 | `email`     | `string` | email do usuario   |
 | `kind`      | `string` | tipo do usuario    |
 
-## 5. [HOST:PORT]/user/find/id/{id}
+## 5. /user/find/id/{id}
 
 buscar um usuario pelo id.
 somente usuario admin pode utilizar esse endpoint.
@@ -227,7 +240,7 @@ somente usuario admin pode utilizar esse endpoint.
 | `kind`         | `string`   | tipo do usuario                                  |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 6. [HOST:PORT]/user/update/id/{id}
+## 6. /user/update/id/{id}
 
 atualizar um usuario por id.
 
@@ -257,7 +270,7 @@ atualizar um usuario por id.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 7. [HOST:PORT]/user/remove/id/{id}
+## 7. /user/remove/id/{id}
 
 remover um usuario por id.
 
@@ -282,7 +295,7 @@ remover um usuario por id.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 8. [HOST:PORT]/user/login
+## 8. /user/login
 
 fazer login no sistema
 
@@ -309,7 +322,7 @@ fazer login no sistema
 | `token`        | `string`   | token de acesso a aplicação                      |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 9. [HOST:PORT]/user/logout
+## 9. /user/logout
 
 fazer logout no sistema
 
@@ -333,7 +346,7 @@ fazer logout no sistema
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 10. [HOST:PORT]/user/recor/email
+## 10. /user/recor/email
 
 primeiro estagio de recuperação de senha.
 enviar um codigo valido ao email do usuario.
@@ -359,7 +372,7 @@ enviar um codigo valido ao email do usuario.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 11. [HOST:PORT]/user/verific/code
+## 11. /user/verific/code
 
 segundo estagio de recuperação de senha.
 conferi o codigo enviado e devover um token especial.
@@ -386,7 +399,7 @@ conferi o codigo enviado e devover um token especial.
 | `token`        | `string`   | token especial para recuperção de senha          |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 12. [HOST:PORT]/user/password/recovery
+## 12. /user/password/recovery
 
 terceiro estagio de recuperação de senha.
 atualizar senha do usuario.
@@ -412,7 +425,7 @@ atualizar senha do usuario.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 13. [HOST:PORT]/user/password/update
+## 13. /user/password/update
 
 atualizar senha do usuario.
 
@@ -442,7 +455,7 @@ atualizar senha do usuario.
 <hr>
 <h1> POST Routes </h1>
 
-## 14. [HOST:PORT]/post/store
+## 14. /post/store
 
 criando uma postagem.
 somente usuario admin pode utilizar esse endpoint.
@@ -469,7 +482,7 @@ somente usuario admin pode utilizar esse endpoint.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 15. [HOST:PORT]/post/list
+## 15. /post/list
 
 listando todas as postagens
 
@@ -505,7 +518,7 @@ listando todas as postagens
 | `content` | `string` | conteudo da postagem        |
 | `likes`   | `int`    | numero de likes da postagem |
 
-## 16. [HOST:PORT]/post/list/title/{title}
+## 16. /post/list/title/{title}
 
 listando todas as postagens por titulo
 
@@ -542,7 +555,7 @@ listando todas as postagens por titulo
 | `content` | `string` | conteudo da postagem        |
 | `likes`   | `int`    | numero de likes da postagem |
 
-## 17. [HOST:PORT]/post/list/category/name/{category}
+## 17. /post/list/category/name/{category}
 
 listando todas as postagens por categoria
 
@@ -579,7 +592,7 @@ listando todas as postagens por categoria
 | `content` | `string` | conteudo da postagem        |
 | `likes`   | `int`    | numero de likes da postagem |
 
-## 18. [HOST:PORT]/post/find/id/{id}
+## 18. /post/find/id/{id}
 
 buscando uma postagem pelo id
 somente usuario admin pode utilizar esse endpoint.
@@ -611,7 +624,7 @@ somente usuario admin pode utilizar esse endpoint.
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
 
-## 19. [HOST:PORT]/post/update/id/{id}
+## 19. /post/update/id/{id}
 
 atualizando uma postagem.
 somente usuario admin pode utilizar esse endpoint.
@@ -639,7 +652,7 @@ somente usuario admin pode utilizar esse endpoint.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 20. [HOST:PORT]/post/remove/id/{id}
+## 20. /post/remove/id/{id}
 
 removendo uma postagem pelo id
 somente usuario admin pode utilizar esse endpoint.
@@ -669,7 +682,7 @@ somente usuario admin pode utilizar esse endpoint.
 <hr>
 <h1> Category Routes </h1>
 
-## 22. [HOST:PORT]/category/store
+## 22. /category/store
 
 criando uma categoria.
 somente usuario admin pode utilizar esse endpoint.
@@ -695,7 +708,7 @@ somente usuario admin pode utilizar esse endpoint.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 22. [HOST:PORT]/category/list
+## 22. /category/list
 
 listando todas as categorias
 
@@ -729,7 +742,7 @@ listando todas as categorias
 | `categoryID` | `string` | id da category   |
 | `name`       | `string` | nome da category |
 
-## 23. [HOST:PORT]/category/find/id/{id}
+## 23. /category/find/id/{id}
 
 buscando uma categoria pelo id
 somente usuario admin pode utilizar esse endpoint.
@@ -759,7 +772,7 @@ somente usuario admin pode utilizar esse endpoint.
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
 
-## 24. [HOST:PORT]/category/update/id/{id}
+## 24. /category/update/id/{id}
 
 atualizando uma categoria.
 somente usuario admin pode utilizar esse endpoint.
@@ -786,7 +799,7 @@ somente usuario admin pode utilizar esse endpoint.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 25. [HOST:PORT]/category/remove/id/{id}
+## 25. /category/remove/id/{id}
 
 removendo uma categoria pelo id
 somente usuario admin pode utilizar esse endpoint.
@@ -816,7 +829,7 @@ somente usuario admin pode utilizar esse endpoint.
 <hr>
 <h1> Post Category Routes </h1>
 
-## 26. [HOST:PORT]/post/category/store
+## 26. /post/category/store
 
 criando uma relação entre categoria e postagem.
 somente usuario admin pode utilizar esse endpoint.
@@ -843,7 +856,7 @@ somente usuario admin pode utilizar esse endpoint.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 27. [HOST:PORT]/category/remove/id/{id}
+## 27. /category/remove/id/{id}
 
 removendo uma categoria pelo id
 somente usuario admin pode utilizar esse endpoint.
@@ -874,7 +887,7 @@ somente usuario admin pode utilizar esse endpoint.
 <hr>
 <h1> numberLikes Routes </h1>
 
-## 28. [HOST:PORT]/user/post/like
+## 28. /user/post/like
 
 curtir postagem.
 
@@ -899,7 +912,7 @@ curtir postagem.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 29. [HOST:PORT]/user/post/dislike
+## 29. /user/post/dislike
 
 descurtir uma postagem.
 
@@ -928,7 +941,7 @@ descurtir uma postagem.
 <hr>
 <h1> comment Routes </h1>
 
-## 30. [HOST:PORT]/comment/store
+## 30. /comment/store
 
 criar comentario de uma postagem.
 
@@ -955,7 +968,7 @@ criar comentario de uma postagem.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 31. [HOST:PORT]/comment/list/post/id/{postID}
+## 31. /comment/list/post/id/{postID}
 
 listando todos os comentarios de uma postagem.
 
@@ -993,7 +1006,7 @@ listando todos os comentarios de uma postagem.
 | `userID`    | `string` | id do usuario        |
 | `postID`    | `string` | id do post           |
 
-## 32. [HOST:PORT]/comment/list/user
+## 32. /comment/list/user
 
 listando todos os comentarios do usuario.
 
@@ -1030,7 +1043,7 @@ listando todos os comentarios do usuario.
 | `userID`    | `string` | id do usuario        |
 | `postID`    | `string` | id do post           |
 
-## 33. [HOST:PORT]/comment/list/user/post/id/{postID}
+## 33. /comment/list/user/post/id/{postID}
 
 listando todos os comentarios de um usuario em uma postagem.
 
@@ -1068,7 +1081,7 @@ listando todos os comentarios de um usuario em uma postagem.
 | `userID`    | `string` | id do usuario        |
 | `postID`    | `string` | id do post           |
 
-## 34. [HOST:PORT]/comment/find/id/{id}
+## 34. /comment/find/id/{id}
 
 buscando um comentario pelo id.
 
@@ -1099,7 +1112,7 @@ buscando um comentario pelo id.
 | `postID`       | `string` | id do post                                       |
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
-## 35. [HOST:PORT]/comment/update/id/{id}
+## 35. /comment/update/id/{id}
 
 atualizando um comentario.
 
@@ -1126,7 +1139,7 @@ atualizando um comentario.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 36. [HOST:PORT]/comment/remove/id/{id}
+## 36. /comment/remove/id/{id}
 
 remover um comentario.
 
@@ -1155,7 +1168,7 @@ remover um comentario.
 <hr>
 <h1> response comment Routes </h1>
 
-## 37. [HOST:PORT]/response/comment/store
+## 37. /response/comment/store
 
 responder a um comentario de um usuario.
 
@@ -1182,7 +1195,7 @@ responder a um comentario de um usuario.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 38. [HOST:PORT]/response/comment/list/comment/id/{commentID}
+## 38. /response/comment/list/comment/id/{commentID}
 
 listando todos os comentarios de resposta de um comentario.
 
@@ -1220,7 +1233,7 @@ listando todos os comentarios de resposta de um comentario.
 | `commentID`         | `string` | id do comentario                   |
 | `userID`            | `string` | id do usuario                      |
 
-## 39. [HOST:PORT]/response/comment/list/user
+## 39. /response/comment/list/user
 
 listando todos os comentarios de resposta de um usuario.
 
@@ -1258,7 +1271,7 @@ listando todos os comentarios de resposta de um usuario.
 | `userID`            | `string` | id do usuario                      |
 
 
-## 40. [HOST:PORT]/response/comment/update/id/{id}
+## 40. /response/comment/update/id/{id}
 
 atualizando um comentario de resposta.
 
@@ -1285,7 +1298,7 @@ atualizando um comentario de resposta.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 41. [HOST:PORT]/response/comment/remove/id/{id}
+## 41. /response/comment/remove/id/{id}
 
 remover um comentario de resposta.
 
@@ -1314,7 +1327,7 @@ remover um comentario de resposta.
 <hr>
 <h1> config Routes </h1>
 
-## 42. [HOST:PORT]/config/store
+## 42. /config/store
 
 criar uma configuração.
 somente usuario admin pode utilizar esse endpoint.
@@ -1343,7 +1356,7 @@ somente usuario admin pode utilizar esse endpoint.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 43. [HOST:PORT]/config/list
+## 43. /config/list
 
 listando todas as configurações.
 somente usuario admin pode utilizar esse endpoint.
@@ -1381,7 +1394,7 @@ somente usuario admin pode utilizar esse endpoint.
 | `menuAncoras` | `string` | ancoras do menu    |
 | `banner`      | `string` | url do banner      |
 
-## 44. [HOST:PORT]/config/find/id/{id}
+## 44. /config/find/id/{id}
 
 buscando uma configuração pelo id.
 somente usuario admin pode utilizar esse endpoint.
@@ -1413,7 +1426,7 @@ somente usuario admin pode utilizar esse endpoint.
 | `mid`          | `string` | mensagem da resposta caso o codigo http seja 200 |
 
 
-## 45. [HOST:PORT]/config/update/id/{id}
+## 45. /config/update/id/{id}
 
 atualizando uma configuração.
 somente usuario admin pode utilizar esse endpoint.
@@ -1443,7 +1456,7 @@ somente usuario admin pode utilizar esse endpoint.
 | -------------- | ---------- | ------------------------------------------------ |
 | `mid`          | `string`   | mensagem da resposta caso o codigo http seja 200 |
 
-## 46. [HOST:PORT]/config/remove/id/{id}
+## 46. /config/remove/id/{id}
 
 remover uma configuração.
 somente usuario admin pode utilizar esse endpoint.
