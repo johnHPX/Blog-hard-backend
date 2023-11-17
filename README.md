@@ -1,9 +1,9 @@
-# blog-hard-backend
+# BlogHard - backend
 Um sistema de gerenciamento de conteúdo(O famoso CMS) feito com GO, postgress e docker. Tem como obejtivo implementar as funcionalidades de um Blog.
 
 Toda documentação necessaria está na pasta "docs" e nesse link: https://drive.google.com/drive/u/0/folders/1z8u4znIMH_JeN_aGTfhnGvXcb_ZesLO8
 
-## funcionalidades principais adicionadas nesse projeto.
+## Funcionalidades principais adicionadas nesse projeto.
 <ol>
    <li>Padrão MVC(model, view, controller)</li>
    <p>Introduzi pela segunda vez, porém de forma mais aprimorada o padrão MVC</p>
