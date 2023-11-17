@@ -5,8 +5,8 @@ Toda documentação necessaria está na pasta "docs" e nesse link: https://drive
 
 ## Funcionalidades principais adicionadas nesse projeto.
 <ol>
-   <li>Padrão MVC(model, view, controller)</li>
-   <p>Introduzi pela segunda vez, porém de forma mais aprimorada o padrão MVC</p>
+   <li>Arquitetura de software baseado em camadas</li>
+   <p>Arquiterura limpa e de facil manutenção.</p>
    <li>Algoritmo de Recuperação de Senha Avançado.</li>
    <p>São 3 estágios. 1. o usuário tenta recuperar a senha pelo email, ao digitar o sistema verifica se o e-mail está cadastrado e se pertence aquele usuário, depois ele envia um código de 6 dígitos para o email do usuário. 2. o usuário digita e enviar o código para API, ela verifica se está correto e caso sim, retorna um token especial para recuperar a senha. 3. com o token especial o usuário pode alterar a senha.</p>
    <li>Migrations e PostgreSQL</li>
