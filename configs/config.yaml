@@ -8,5 +8,5 @@ database:
   dbnm: "db-blogHard"
   port: "5432"
 contact:
-  email: "testeservice763@gmail.com"
-  secret: "aulxrtwjnbaluuoy"
+  email: "-"
+  secret: "-"
