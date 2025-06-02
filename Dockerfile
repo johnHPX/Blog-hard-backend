@@ -2,8 +2,8 @@
 FROM golang:1.18.3 as builder
 
 # É importante que esses ARGs sejam definidos após a instrução FROM
-ARG ACCESS_TOKEN_USR="johnHPX"
-ARG ACCESS_TOKEN_PWD="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"
+ARG ACCESS_TOKEN_USR="-"
+ARG ACCESS_TOKEN_PWD="-"
 
 # Cria os arquivos de usuário e grupo que serão usados ​​na execução
 # container para executar o processo como usuário sem privilégios.
