@@ -3,8 +3,8 @@ project:
   port: "40183"
 database:
   host: "localhost"
-  user: "postgres"
-  pswd: "1234567890"
+  user: "admin"
+  pswd: "senha123"
   dbnm: "db-blogHard"
   port: "5432"
 contact:
